@@ -221,37 +221,124 @@ export const useGameState = () => {
           const aiMove = getBestMove(prev.board, 'black', prev.aiLevel);
 
           if (aiMove) {
-            // Play a sound based on what kind of move the AI picked.
-            if (aiMove.isJump) playJumpSound();
-            else playMoveSound();
+            // Check if this is a multi-jump sequence
+            if (aiMove.isJump && aiMove.jumpSequence && aiMove.jumpSequence.length > 1) {
+              // Multi-jump: animate each jump sequentially
+              let currentBoard = prev.board;
+              let currentPos = aiMove.from;
+              let jumpIndex = 0;
 
-            const newBoard = executeMove(prev.board, aiMove);
+              const executeNextJump = () => {
+                if (jumpIndex >= aiMove.jumpSequence!.length) {
+                  // All jumps complete, finalize the turn
+                  const elapsed = Date.now() - prev.turnStartTime;
+                  const winner = checkGameOver(currentBoard);
 
-            // If the AI just got a King, celebrate it!
-            const movedPiece = newBoard[aiMove.to.row][aiMove.to.col];
-            if (movedPiece?.isKing && !prev.board[aiMove.from.row][aiMove.from.col]?.isKing) {
-              playKingSound();
-            }
+                  setGameState(prevState => ({
+                    ...prevState,
+                    board: currentBoard,
+                    currentPlayer: 'red',
+                    isAiTurn: false,
+                    selectedPosition: null,
+                    validMoves: [],
+                    winner: winner,
+                    scores: updateScores(currentBoard),
+                    turnStartTime: Date.now(),
+                    totalTime: { ...prevState.totalTime, black: prevState.totalTime.black + elapsed },
+                    lastAIMove: undefined // Clear to avoid stale highlight
+                  }));
+                  return;
+                }
 
-            const elapsed = Date.now() - prev.turnStartTime;
-            const winner = checkGameOver(newBoard);
-            return {
-              ...prev,
-              board: newBoard,
-              currentPlayer: 'red',
-              isAiTurn: false,
-              selectedPosition: null,
-              validMoves: [],
-              winner: winner,
-              scores: updateScores(newBoard),
-              turnStartTime: Date.now(),
-              totalTime: { ...prev.totalTime, black: prev.totalTime.black + elapsed },
-              lastAIMove: {
-                from: aiMove.from,
-                to: aiMove.to,
-                timestamp: Date.now()
+                const landingPos = aiMove.jumpSequence![jumpIndex];
+
+                // Calculate the jumped piece position
+                const jumpedRow = (currentPos.row + landingPos.row) / 2;
+                const jumpedCol = (currentPos.col + landingPos.col) / 2;
+
+                // Execute this single jump
+                const newBoard = currentBoard.map(r => [...r]);
+                const piece = { ...newBoard[currentPos.row][currentPos.col]! };
+
+                // Remove jumped piece
+                newBoard[jumpedRow][jumpedCol] = null;
+
+                // Move the piece
+                newBoard[landingPos.row][landingPos.col] = piece;
+                newBoard[currentPos.row][currentPos.col] = null;
+
+                // Check for king promotion
+                if (!piece.isKing) {
+                  if (piece.color === 'black' && landingPos.row === 7) {
+                    piece.isKing = true;
+                    newBoard[landingPos.row][landingPos.col] = piece;
+                    playKingSound();
+                  }
+                }
+
+                // Play jump sound
+                playJumpSound();
+
+                // Update state with this jump and show highlight
+                currentBoard = newBoard;
+                setGameState(prevState => ({
+                  ...prevState,
+                  board: currentBoard,
+                  scores: updateScores(currentBoard),
+                  lastAIMove: {
+                    from: currentPos,
+                    to: landingPos,
+                    timestamp: Date.now()
+                  }
+                }));
+
+                currentPos = landingPos;
+                jumpIndex++;
+
+                // Schedule next jump after delay
+                setTimeout(executeNextJump, 1800); // 1.8s between jumps
+              };
+
+              // Start the jump sequence
+              executeNextJump();
+
+              // Return current state (will be updated by executeNextJump)
+              return prev;
+
+            } else {
+              // Single move or single jump - execute immediately
+              if (aiMove.isJump) playJumpSound();
+              else playMoveSound();
+
+              const newBoard = executeMove(prev.board, aiMove);
+
+              // If the AI just got a King, celebrate it!
+              const movedPiece = newBoard[aiMove.to.row][aiMove.to.col];
+              if (movedPiece?.isKing && !prev.board[aiMove.from.row][aiMove.from.col]?.isKing) {
+                playKingSound();
               }
-            };
+
+              const elapsed = Date.now() - prev.turnStartTime;
+              const winner = checkGameOver(newBoard);
+
+              return {
+                ...prev,
+                board: newBoard,
+                currentPlayer: 'red',
+                isAiTurn: false,
+                selectedPosition: null,
+                validMoves: [],
+                winner: winner,
+                scores: updateScores(newBoard),
+                turnStartTime: Date.now(),
+                totalTime: { ...prev.totalTime, black: prev.totalTime.black + elapsed },
+                lastAIMove: {
+                  from: aiMove.from,
+                  to: aiMove.to,
+                  timestamp: Date.now()
+                }
+              };
+            }
           } else {
             // If the AI has absolutely no moves left, Red wins by default.
             return { ...prev, winner: 'red', isAiTurn: false };
