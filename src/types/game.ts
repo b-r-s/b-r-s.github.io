@@ -41,6 +41,20 @@ export type GameMode = 'PvP' | 'PvAI';
 
 export type AILevel = 'beginner' | 'intermediate' | 'advanced';
 
+export interface MoveHistoryEntry {
+  move: Move;
+  boardBefore: BoardState;
+  scoresBefore: {
+    red: ScoreBreakdown;
+    black: ScoreBreakdown;
+  };
+  playerBefore: Player;
+  timeBefore: {
+    turnStartTime: number;
+    totalTime: { red: number; black: number };
+  };
+}
+
 export interface GameState {
   board: BoardState;
   currentPlayer: Player;
@@ -64,5 +78,11 @@ export interface GameState {
     to: Position;
     timestamp: number;
   };
+  lastUndoMove?: {
+    from: Position;
+    to: Position;
+    timestamp: number;
+  };
+  moveHistory: MoveHistoryEntry[];
   moveCount: number;
 }

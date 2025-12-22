@@ -5,18 +5,12 @@ import { useGameState } from './hooks/useGameState';
 import { useSettings } from './hooks/useSettings';
 import { BOARD_COLOR_SCHEMES } from './utils/colorThemes';
 import { useEffect, useState } from 'react';
+import logo from './assets/logo.png';
 
 function App() {
-  const { gameState, handleTileClick, movePiece, setAILevel, restartGame, toastMessage } = useGameState();
+  const { gameState, handleTileClick, movePiece, setAILevel, restartGame, undoMove, clearUndoHighlight, toastMessage } = useGameState();
   const { settings, updateSettings } = useSettings();
   const [showPlayAgain, setShowPlayAgain] = useState(false);
-
-  // Reset Play Again button when game is not over
-  useEffect(() => {
-    if (!gameState.winner) {
-      setShowPlayAgain(false);
-    }
-  }, [gameState.winner]);
 
   const handleRestart = () => {
     setShowPlayAgain(false);
@@ -39,6 +33,7 @@ function App() {
             onTileClick={handleTileClick}
             onMovePiece={movePiece}
             onRestart={handleRestart}
+            onClearUndoHighlight={clearUndoHighlight}
             toastMessage={toastMessage}
             playerColor={settings.playerColor}
             onModalFadeComplete={() => setShowPlayAgain(true)}
@@ -55,6 +50,9 @@ function App() {
           onSettingsChange={updateSettings}
           showPlayAgain={showPlayAgain}
           onPlayAgain={handleRestart}
+          canUndo={gameState.aiLevel === 'beginner' && gameState.moveHistory.length >= 2 && !gameState.isAiTurn && !gameState.winner}
+          onUndo={undoMove}
+          logo={logo}
         />
       </div>
     </div>

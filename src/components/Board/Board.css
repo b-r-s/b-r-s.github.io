@@ -129,6 +129,30 @@ v
   z-index: 5;
 }
 
+/* Jump Hint Arrow for Beginner Level */
+.jump-hint-arrow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2.5vw;
+  pointer-events: none;
+  z-index: 8;
+  animation: jump-hint-pulse 1s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.8));
+}
+
+@keyframes jump-hint-pulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.8;
+  }
+}
+
 @keyframes blinkBorder {
 
   0%,
@@ -138,6 +162,37 @@ v
     border: 5px solid #00ff00;
     /* Bright Green */
     box-shadow: 0 0 20px #00ff00, inset 0 0 20px rgba(0, 255, 0, 0.3);
+  }
+
+  12.5%,
+  37.5%,
+  62.5%,
+  87.5% {
+    border: 5px solid transparent;
+    box-shadow: none;
+  }
+
+  100% {
+    border: 5px solid transparent;
+    box-shadow: none;
+  }
+}
+
+/* Undo Move Highlight */
+.board-square.undo-move-highlight {
+  animation: blinkBorderUndo 1.2s ease-in-out forwards;
+  z-index: 5;
+}
+
+@keyframes blinkBorderUndo {
+
+  0%,
+  25%,
+  50%,
+  75% {
+    border: 5px solid #f59e0b;
+    /* Bright Orange */
+    box-shadow: 0 0 20px #f59e0b, inset 0 0 20px rgba(245, 158, 11, 0.3);
   }
 
   12.5%,
@@ -257,6 +312,10 @@ v
 
   .board-square.ai-move-highlight {
     border-width: 3px;
+  }
+
+  .jump-hint-arrow {
+    font-size: 6vw;
   }
 
   @keyframes blinkBorder {

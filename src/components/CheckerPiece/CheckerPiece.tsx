@@ -1,8 +1,8 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import type { FC } from 'react';
 import './CheckerPiece.css';
 import type { PlayerColorTheme } from '../../types/game';
-import { getColorFilterCSS } from '../../utils/colorThemes';
+import { getColorFilterCSS, COLOR_THEMES } from '../../utils/colorThemes';
 
 // Import images from assets
 import RedChecker from '../../assets/RedChecker.png';
@@ -35,6 +35,8 @@ export const CheckerPiece: FC<CheckerPieceProps> = ({
   colorTheme,
 }) => {
   const imgRef = useRef<HTMLImageElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [dragImage, setDragImage] = useState<HTMLCanvasElement | HTMLImageElement | null>(null);
 
   // Select the appropriate PNG based on color and king status
   const getPieceImage = () => {
@@ -45,6 +47,43 @@ export const CheckerPiece: FC<CheckerPieceProps> = ({
   };
 
   const pieceImage = getPieceImage();
+
+  // Create colored canvas image for drag ghost when color theme changes
+  useEffect(() => {
+    if (!colorTheme || !imgRef.current || !canvasRef.current) {
+      setDragImage(imgRef.current);
+      return;
+    }
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const img = imgRef.current;
+
+    if (!ctx) return;
+
+    // Wait for image to load
+    const createColoredDragImage = () => {
+      canvas.width = 80;
+      canvas.height = 80;
+
+      // Apply the color filter using canvas
+      const filter = COLOR_THEMES[colorTheme];
+      ctx.filter = `hue-rotate(${filter.hueRotate}deg) saturate(${filter.saturate}) brightness(${filter.brightness})`;
+      
+      ctx.drawImage(img, 0, 0, 80, 80);
+      
+      // Reset filter
+      ctx.filter = 'none';
+      
+      setDragImage(canvas);
+    };
+
+    if (img.complete) {
+      createColoredDragImage();
+    } else {
+      img.onload = createColoredDragImage;
+    }
+  }, [colorTheme, pieceImage]);
 
   const classNames = [
     'checker-piece',
@@ -57,11 +96,11 @@ export const CheckerPiece: FC<CheckerPieceProps> = ({
   const colorFilterStyle = colorTheme ? { filter: getColorFilterCSS(colorTheme) } : {};
 
   const handleDragStart = (e: React.DragEvent) => {
-    // Use the hidden drag image element for a clean drag preview
-    if (imgRef.current) {
+    // Use the colored canvas or fallback to the original image
+    if (dragImage) {
       try {
         // Set drag image with offset at center (40x40 is approx center of 80x80 piece)
-        e.dataTransfer.setDragImage(imgRef.current, 40, 40);
+        e.dataTransfer.setDragImage(dragImage, 40, 40);
       } catch (err) {
         // Silently fail if drag image can't be set - browser will use default
       }
@@ -99,7 +138,12 @@ export const CheckerPiece: FC<CheckerPieceProps> = ({
         src={pieceImage}
         alt="drag-ghost"
         className="drag-ghost"
-        style={colorFilterStyle}
+      />
+      
+      {/* Hidden canvas for colored drag image */}
+      <canvas
+        ref={canvasRef}
+        className="drag-ghost"
       />
     </div>
   );

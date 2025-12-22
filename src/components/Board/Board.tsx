@@ -11,13 +11,14 @@ export interface BoardProps {
   onTileClick: (row: number, col: number) => void;
   onMovePiece: (from: { row: number; col: number }, to: { row: number; col: number }) => void;
   onRestart: () => void;
+  onClearUndoHighlight: () => void;
   toastMessage: string | null;
   playerColor: PlayerColorTheme;
   onModalFadeComplete?: () => void;
 }
 
-export const Board: React.FC<BoardProps> = ({ gameState, onTileClick, onMovePiece, toastMessage, playerColor, onModalFadeComplete }) => {
-  const { board, selectedPosition, validMoves, lastAIMove, winner } = gameState;
+export const Board: React.FC<BoardProps> = ({ gameState, onTileClick, onMovePiece, onClearUndoHighlight, toastMessage, playerColor, onModalFadeComplete }) => {
+  const { board, selectedPosition, validMoves, lastAIMove, lastUndoMove, winner } = gameState;
   const [draggingPos, setDraggingPos] = useState<{ row: number; col: number } | null>(null);
   const [hoveredSquare, setHoveredSquare] = useState<{ row: number; col: number } | null>(null);
   const [pieceHovered, setPieceHovered] = useState<{ row: number; col: number } | null>(null);
@@ -34,6 +35,16 @@ export const Board: React.FC<BoardProps> = ({ gameState, onTileClick, onMovePiec
     }
   }, [winner]);
 
+  // Clear undo move highlight after animation
+  React.useEffect(() => {
+    if (lastUndoMove) {
+      const timer = setTimeout(() => {
+        onClearUndoHighlight();
+      }, 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [lastUndoMove, onClearUndoHighlight]);
+
   // Performance optimization: create a Set for O(1) lookup instead of O(n) array.some()
   const validMoveMap = useMemo(() => {
     const map = new Set<string>();
@@ -46,6 +57,54 @@ export const Board: React.FC<BoardProps> = ({ gameState, onTileClick, onMovePiec
     hoverValidMoves.forEach(m => map.add(`${m.to.row},${m.to.col}`));
     return map;
   }, [hoverValidMoves]);
+
+  // Create a Set of jump landing positions for beginner jump hints
+  // Shows target emoji on ALL landing squares in jump sequence (including multi-jumps)
+  const jumpLandingMap = useMemo(() => {
+    const map = new Set<string>();
+    if (gameState.aiLevel === 'beginner' && gameState.currentPlayer === 'red') {
+      if (selectedPosition) {
+        // Show landing targets for the selected piece's jumps (all squares in sequence)
+        validMoves.forEach(move => {
+          if (move.isJump) {
+            // For multi-jumps, mark all intermediate landing positions
+            if (move.jumpSequence && move.jumpSequence.length > 0) {
+              move.jumpSequence.forEach(pos => {
+                map.add(`${pos.row},${pos.col}`);
+              });
+            } else {
+              // Single jump - mark the final position
+              map.add(`${move.to.row},${move.to.col}`);
+            }
+          }
+        });
+      } else {
+        // Show all possible jump landing squares (forced jump scenario)
+        for (let row = 0; row < 8; row++) {
+          for (let col = 0; col < 8; col++) {
+            const piece = gameState.board[row][col];
+            if (piece?.color === 'red') {
+              // Check if this piece has any jump moves available
+              const pieceJumps = getValidMovesForPiece(gameState.board, piece, { row, col });
+              pieceJumps.forEach(move => {
+                if (move.isJump) {
+                  // Mark all squares in jump sequence
+                  if (move.jumpSequence && move.jumpSequence.length > 0) {
+                    move.jumpSequence.forEach(pos => {
+                      map.add(`${pos.row},${pos.col}`);
+                    });
+                  } else {
+                    map.add(`${move.to.row},${move.to.col}`);
+                  }
+                }
+              });
+            }
+          }
+        }
+      }
+    }
+    return map;
+  }, [validMoves, gameState.aiLevel, gameState.currentPlayer, gameState.board, selectedPosition]);
 
   const onDragStart = (row: number, col: number) => {
     // Select the piece so valid moves are calculated
@@ -251,6 +310,15 @@ export const Board: React.FC<BoardProps> = ({ gameState, onTileClick, onMovePiec
               (lastAIMove.to.row === rowIndex && lastAIMove.to.col === colIndex)
             );
 
+            // Check if this square is part of the last undo move
+            const isUndoMoveSquare = lastUndoMove && (
+              (lastUndoMove.from.row === rowIndex && lastUndoMove.from.col === colIndex) ||
+              (lastUndoMove.to.row === rowIndex && lastUndoMove.to.col === colIndex)
+            );
+
+            // Check if this square is a jump landing target (beginner hint)
+            const isJumpLanding = jumpLandingMap.has(`${rowIndex},${colIndex}`);
+
             return (
               <div
                 key={`${rowIndex}-${colIndex}`}
@@ -264,6 +332,7 @@ export const Board: React.FC<BoardProps> = ({ gameState, onTileClick, onMovePiec
                   ${showGoldBorder ? 'gold-border' : ''}
                   ${isPieceHovered ? 'piece-hovered' : ''}
                   ${isAIMoveSquare ? 'ai-move-highlight' : ''}
+                  ${isUndoMoveSquare ? 'undo-move-highlight' : ''}
                 `}
                 onClick={() => onTileClick(rowIndex, colIndex)}
                 onDragOver={(e) => onDragOver(e, rowIndex, colIndex)}
@@ -277,6 +346,11 @@ export const Board: React.FC<BoardProps> = ({ gameState, onTileClick, onMovePiec
                 onTouchCancel={onTouchCancel}
               >
                 {/* Highlight marker for valid moves (either selected or hovered) handled by CSS ::after */}
+
+                {/* Beginner jump hint - shows target on landing square */}
+                {isJumpLanding && (
+                  <div className="jump-hint-arrow">🎯</div>
+                )}
 
                 {piece && (
                   <CheckerPiece

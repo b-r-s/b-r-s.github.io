@@ -16,7 +16,8 @@ export interface SidebarProps {
   onSettingsChange: (settings: Partial<GameSettings>) => void;
   showPlayAgain?: boolean;
   onPlayAgain?: () => void;
-}
+  canUndo?: boolean;
+  onUndo?: () => void;  logo?: string;}
 
 // Helper to format milliseconds to MM:SS
 const formatTime = (ms: number): string => {
@@ -36,7 +37,10 @@ export function Sidebar({
   settings,
   onSettingsChange,
   showPlayAgain,
-  onPlayAgain
+  onPlayAgain,
+  canUndo,
+  onUndo,
+  logo
 }: SidebarProps) {
   const [activeTab, setActiveTab] = useState<'game' | 'settings' | 'colors' | 'board'>('game');
   const [currentMoveTime, setCurrentMoveTime] = useState(0);
@@ -65,7 +69,7 @@ export function Sidebar({
 
             </span>
             <span className={colorClass}>{label}</span>
-            {isAI && <span className="opacity-50 al-level"> {aiLevel} Level</span >}
+            {isAI && <span className="ai-difficulty-label"> {aiLevel.charAt(0).toUpperCase() + aiLevel.slice(1)}</span >}
 
             {isActive && <span className="animate-pulse">⏱️</span>}
           </span>
@@ -134,12 +138,25 @@ export function Sidebar({
       <div className="sidebar-content">
         {activeTab === 'game' ? (
           <>
-            <h2 className="sidebar-title">Current Match</h2>
+            <div className="sidebar-header-with-logo">
+              {logo && <img src={logo} alt="Checkers4Pi Logo" className="sidebar-logo" />}
+              <h2 className="sidebar-title">Current Match</h2>
+            </div>
             <div className="match-stats-container">
               {renderPlayerScore('red', 'Red (You)', '🔴')}
               {renderPlayerScore('black', 'Black (AI)', '⚫')}
-
             </div>
+            
+            {/* Undo Move Button - Only for Beginner Level */}
+            {canUndo && (
+              <button
+                className="undo-move-btn"
+                onClick={onUndo}
+                title="Undo the last move (both yours and AI's)"
+              >
+                ⟲ Undo Move
+              </button>
+            )}
           </>
         ) : activeTab === 'settings' ? (
           <>
@@ -196,6 +213,9 @@ export function Sidebar({
         ) : activeTab === 'board' ? (
           <>
             <h2 className="sidebar-title">Board Colors</h2>
+            <p className="difficulty-desc">
+              Choose your board color scheme for the checkerboard.
+            </p>
             <div className="settings-content">
               {(Object.keys(BOARD_THEME_LABELS) as BoardColorTheme[]).map((theme) => {
                 const colors = BOARD_COLOR_SCHEMES[theme];
@@ -213,9 +233,6 @@ export function Sidebar({
                   </button>
                 );
               })}
-              <p className="difficulty-desc">
-                Choose your board color scheme for the checkerboard.
-              </p>
             </div>
           </>
         ) : null}
