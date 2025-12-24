@@ -1,8 +1,6 @@
 ﻿import { useState, useMemo } from 'react';
 import * as PiSDK from '@xhilo/pi-sdk';
-import { MockPi, isPiBrowserAvailable, showMockBanner } from '../utils/mockPiSdk';
 import { createRealPaymentCallbacks } from './piNetworkCallbacks';
-import { createMockPaymentCallbacks } from './mockPiNetworkCallbacks';
 
 // Type definitions for Pi Network SDK
 interface PiUser {
@@ -58,39 +56,27 @@ interface PiNetworkInstance {
   ) => void;
 }
 
-// Handle both default and named exports
-// Use mock if Pi SDK is not available (for local testing)
-const PiNetwork = isPiBrowserAvailable() 
-  ? ((PiSDK as Record<string, unknown>).PiNetwork || 
-     ((PiSDK as Record<string, unknown>).default as Record<string, unknown> | undefined)?.PiNetwork || 
-     (PiSDK as Record<string, unknown>).default)
-  : MockPi.PiNetwork;
-
-// Show mock banner if using mock SDK
-if (!isPiBrowserAvailable() && typeof window !== 'undefined') {
-  showMockBanner();
-}
-
-// Backend API base URL (adjust for your deployment)
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+// Handle both default and named exports from Pi SDK
+const PiNetwork = 
+  (PiSDK as Record<string, unknown>).PiNetwork || 
+  ((PiSDK as Record<string, unknown>).default as Record<string, unknown> | undefined)?.PiNetwork || 
+  (PiSDK as Record<string, unknown>).default;
 
 export const usePiNetwork = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<PiUser | null>(null);
   const [currentPayment, setCurrentPayment] = useState<string | null>(null);
-  const [isMockMode] = useState(!isPiBrowserAvailable());
 
   // Initialize Pi SDK instance once
   const pi = useMemo<PiNetworkInstance | null>(() => {
     if (typeof PiNetwork !== 'function') {
-      console.warn('Pi Network SDK not available');
       return null;
     }
 
     try {
       const piInstance = new (PiNetwork as new (config: { version: string; sandbox: boolean }) => PiNetworkInstance)({
         version: "2.0",
-        sandbox: true, // Set to false for production
+        sandbox: true,
       });
 
       // Initialize and check authentication
@@ -99,11 +85,12 @@ export const usePiNetwork = () => {
           setIsAuthenticated(true);
           setUser(piInstance.getUser());
         }
-      }).catch(console.error);
+      }).catch(() => {
+        // Silent catch - SDK not available
+      });
 
       return piInstance;
-    } catch (error) {
-      console.error('Failed to initialize Pi Network SDK:', error);
+    } catch {
       return null;
     }
   }, []);
@@ -114,7 +101,6 @@ export const usePiNetwork = () => {
     try {
       await pi.authenticate(['username', 'payments'], (error: Error | null, auth: PiAuth | null) => {
         if (error) {
-          console.error('Pi Network authentication error:', error);
           return;
         }
 
@@ -123,8 +109,8 @@ export const usePiNetwork = () => {
           setUser(auth.user);
         }
       });
-    } catch (error) {
-      console.error('Pi Network authentication failed:', error);
+    } catch {
+      // Silent catch
     }
   };
 
@@ -139,10 +125,7 @@ export const usePiNetwork = () => {
 
     return new Promise((resolve) => {
       try {
-        // Use appropriate callbacks based on mock mode
-        const callbacks = isMockMode
-          ? createMockPaymentCallbacks(setCurrentPayment, resolve)
-          : createRealPaymentCallbacks(setCurrentPayment, resolve);
+        const callbacks = createRealPaymentCallbacks(setCurrentPayment, resolve);
 
         pi.createPayment(
           {
@@ -155,8 +138,7 @@ export const usePiNetwork = () => {
           },
           callbacks
         );
-      } catch (error) {
-        console.error('Failed to create payment:', error);
+      } catch {
         resolve({ success: false, error: 'Failed to create payment' });
       }
     });
@@ -167,7 +149,6 @@ export const usePiNetwork = () => {
     isAuthenticated,
     user,
     currentPayment,
-    isMockMode,
     authenticate,
     createPayment,
   };

@@ -14,14 +14,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Request logging (development only)
-if (config.isDevelopment) {
-  app.use((req, res, next) => {
-    console.log(`${req.method} ${req.path}`);
-    next();
-  });
-}
-
 // API Routes
 app.use('/api/payments', paymentsRouter);
 
@@ -64,7 +56,6 @@ if (config.isDevelopment) {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error('Server error:', err);
   res.status(500).json({
     error: 'Internal server error',
     message: config.isDevelopment ? err.message : 'An error occurred',

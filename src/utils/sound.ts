@@ -12,7 +12,7 @@ const getAudioContext = () => {
   }
   // AudioContext often starts in 'suspended' state until first user interaction.
   if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume().catch(e => console.error("Audio resume failed", e));
+    audioCtx.resume().catch(() => {});
   }
   return audioCtx;
 };
@@ -37,7 +37,7 @@ export const playMoveSound = () => {
     osc.start();
     osc.stop(ctx.currentTime + 0.1);
   } catch (e) {
-    console.error('Audio play failed', e);
+    // Silent fail
   }
 };
 
@@ -62,7 +62,7 @@ export const playJumpSound = () => {
     osc.start();
     osc.stop(ctx.currentTime + 0.15);
   } catch (e) {
-    console.error('Audio play failed', e);
+    // Silent fail
   }
 };
 
@@ -93,7 +93,7 @@ export const playKingSound = () => {
     osc.start();
     osc.stop(now + 0.8);
   } catch (e) {
-    console.error('Audio play failed', e);
+    // Silent fail
   }
 };
 
@@ -118,7 +118,7 @@ export const playAIMoveSound = () => {
     osc.start();
     osc.stop(ctx.currentTime + 0.12);
   } catch (e) {
-    console.error('Audio play failed', e);
+    // Silent fail
   }
 };
 
@@ -143,6 +143,6 @@ export const playAIJumpSound = () => {
     osc.start();
     osc.stop(ctx.currentTime + 0.15);
   } catch (e) {
-    console.error('Audio play failed', e);
+    // Silent fail
   }
 };

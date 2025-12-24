@@ -37,8 +37,6 @@ router.post('/approve', async (req, res) => {
         },
       }
     );
-
-    console.log(`Payment approved: ${paymentId}`);
     
     res.json({
       success: true,
@@ -46,7 +44,6 @@ router.post('/approve', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Payment approval failed:', error.response?.data || error.message);
     
     res.status(error.response?.status || 500).json({
       error: 'Payment approval failed',
@@ -94,15 +91,12 @@ router.post('/complete', async (req, res) => {
     const payment = response.data;
     
     if (!payment.transaction?.verified) {
-      console.error(`Payment ${paymentId} transaction not verified!`);
       return res.status(400).json({
         error: 'Transaction verification failed',
         message: 'Blockchain transaction could not be verified',
         payment,
       });
     }
-
-    console.log(`Payment completed: ${paymentId}, txid: ${txid}`);
     
     res.json({
       success: true,
@@ -111,7 +105,6 @@ router.post('/complete', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Payment completion failed:', error.response?.data || error.message);
     
     res.status(error.response?.status || 500).json({
       error: 'Payment completion failed',
@@ -148,7 +141,6 @@ router.get('/:paymentId', async (req, res) => {
     res.json(response.data);
 
   } catch (error) {
-    console.error('Get payment failed:', error.response?.data || error.message);
     
     res.status(error.response?.status || 500).json({
       error: 'Failed to retrieve payment',
