@@ -1,20 +1,27 @@
 import './App.css';
 import { Board } from './components/Board';
 import { Sidebar } from './components/Sidebar';
+import SplashScreen from './components/SplashScreen';
 import { useGameState } from './hooks/useGameState';
 import { useSettings } from './hooks/useSettings';
 import { BOARD_COLOR_SCHEMES } from './utils/colorThemes';
 import { useEffect, useState } from 'react';
 import logo from './assets/logo.png';
 
+
 function App() {
   const { gameState, handleTileClick, movePiece, setAILevel, restartGame, undoMove, clearUndoHighlight, toastMessage } = useGameState();
   const { settings, updateSettings } = useSettings();
   const [showPlayAgain, setShowPlayAgain] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
 
   const handleRestart = () => {
     setShowPlayAgain(false);
     restartGame();
+  };
+
+  const handleStartGame = () => {
+    setShowSplash(false);
   };
 
   // Apply board colors as CSS variables
@@ -23,6 +30,10 @@ function App() {
     document.documentElement.style.setProperty('--board-light', colors.light);
     document.documentElement.style.setProperty('--board-dark', colors.dark);
   }, [settings.boardColors]);
+
+  if (showSplash) {
+    return <SplashScreen onStart={handleStartGame} />;
+  }
 
   return (
     <div className="app-container">
