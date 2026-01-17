@@ -54,33 +54,31 @@ export const useGameState = (
     Main state container for the game.
     We track everything here: the board, whose turn it is, scores, and time.
   */
-  const [gameState, setGameState] = useState<GameState>(() => {
-    const initialBoard = createInitialBoard();
-    const redScore = calculateScore(initialBoard, 'red');
-    const blackScore = calculateScore(initialBoard, 'black');
-    const aiLevel = getAILevelFromDifficulty(settings.difficulty);
-    // AI moves first only in advanced mode when setting is enabled
-    const aiMovesFirst = aiLevel === 'advanced' && settings.aiMovesFirst;
-    
-    return {
-      board: initialBoard,
-      currentPlayer: aiMovesFirst ? 'black' : 'red',
-      selectedPosition: null,
-      validMoves: [],
-      winner: null,
-      gameMode: 'PvAI',
-      isAiTurn: false,
-      aiLevel: aiLevel,
-      scores: {
-        red: redScore,
-        black: blackScore
-      },
-      turnStartTime: Date.now(),
-      totalTime: { red: 0, black: 0 },
-      moveHistory: [],
-      moveCount: 0,
-    };
-  });
+    const [gameState, setGameState] = useState<GameState>(() => {
+      const initialBoard = createInitialBoard();
+      const redScore = calculateScore(initialBoard, 'red');
+      const blackScore = calculateScore(initialBoard, 'black');
+      const aiLevel = getAILevelFromDifficulty(settings.difficulty);
+      const aiMovesFirst = aiLevel === 'advanced' && settings.aiMovesFirst;
+      return {
+        board: initialBoard,
+        currentPlayer: aiMovesFirst ? 'black' : 'red',
+        selectedPosition: null,
+        validMoves: [],
+        winner: null,
+        gameMode: 'PvAI',
+        isAiTurn: false,
+        aiLevel: aiLevel,
+        scores: {
+          red: redScore,
+          black: blackScore
+        },
+        turnStartTime: Date.now(),
+        totalTime: { red: 0, black: 0 },
+        moveHistory: [],
+        moveCount: 0,
+      };
+    });
 
   /* 
     This state locks a player into using a specific piece when they are in the 
@@ -243,7 +241,7 @@ export const useGameState = (
 
       return newState;
     }
-  }, [updateScores]);
+  }, [updateScores, onGameEnd]);
 
   // Trigger AI move directly - no useEffect needed
   const triggerAIMove = useCallback(() => {

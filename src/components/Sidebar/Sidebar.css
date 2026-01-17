@@ -510,7 +510,6 @@ span.animate-pulse {
 .difficulty-desc {
   font-size: 0.65rem;
 }
-}
 
 @media (max-width: 480px) {
   .sidebar {

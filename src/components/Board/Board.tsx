@@ -269,6 +269,7 @@ export const Board: React.FC<BoardProps> = ({ gameState, onTileClick, onMovePiec
         <GameOverModal 
           winner={winner}
           scores={gameState.scores}
+          playerColor={playerColor}
           onFadeComplete={() => {
             setShowModal(false);
             onModalFadeComplete?.();

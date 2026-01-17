@@ -12,7 +12,9 @@ const instructions: InstructionItem[] = [
     text: [
       'Welcome to Checkers4Pi!',
       'This guide will help you understand the rules and how to play the game. Checkers is a classic two-player strategy game played on an 8x8 board. Each player controls 12 pieces, with the goal of capturing all opponent pieces or blocking them so they cannot move.',
-      'Checkers4Pi has been designed to incorporate an AI engine for you to play against. The AI difficulty levels are Beginner, Intermediate, and Advanced. Beginner level allows you to undo your last move once per game, and the AI will make almost random moves. Intermediate and Advanced levels do not allow undos. The AI will think several moves ahead at Intermediate and even more at Advanced level to provide a tougher challenge. Finally, at Advanced level you have the option to allow the AI to make the first move.'
+      'Checkers4Pi has been designed to incorporate an AI engine for you to play against. The AI difficulty levels are  Beginner, Intermediate, and Advanced.',
+       ' Beginner level allows you to undo your last move after the AI has made its move, and the AI will make almost random moves.',
+       ' Intermediate and Advanced levels do not allow undos. The AI will think 1 or 2 moves ahead at Intermediate and even more at Advanced level to provide a tougher challenge. Finally, at Advanced level you have the option to allow the AI to make the first move. This will give the AI a slight advantage, but it can be an interesting twist to the game.'
     ]
   },
   {
@@ -53,7 +55,14 @@ const instructions: InstructionItem[] = [
   },
   {
     title: 'AI Opponent',
-    text: 'The AI opponent offers different difficulty levels to challenge your skills. For Beginner level, you can undo your last move once per game and the AI will make random moves. For Intermediate and Advanced levels, the AI uses more sophisticated strategies and undoing moves is not allowed. The AI will think several moves ahead to provide a tougher challenge.'
+    text: [
+      'The AI opponent offers three difficulty levels to challenge your skills:',
+      'Beginner: You can undo your last move once per game. The AI makes random moves and does not look ahead.',
+
+      'Intermediate: The AI uses positional weighting (extra points for controlling the center and keeping pieces on the back row) and looks one move ahead using the minimax algorithm. Undoing moves is not allowed.',
+      
+      'Advanced: The AI uses positional weighting and looks several moves ahead (minimax depth 3 or 4) for a much tougher challenge. You may optionally allow the AI to make the first move. Undoing moves is not allowed.'
+    ]
   }
 ];
 

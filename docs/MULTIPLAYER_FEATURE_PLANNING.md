@@ -3,6 +3,11 @@
 ## Overview
 This document outlines the requirements and considerations for adding a real-time, two-player (human vs human) mode to the Checkers4Pi game, leveraging the Pi Network for user authentication and matchmaking.
 
+**Note:** The current single-player AI opponent uses three difficulty levels:
+	- Beginner: Random moves
+	- Intermediate: Minimax algorithm (depth = 1) with positional weighting (center control, king's row, etc.)
+	- Advanced: Minimax algorithm (depth > 1) with alpha-beta pruning and full positional scoring
+
 ---
 
 ## Core Features

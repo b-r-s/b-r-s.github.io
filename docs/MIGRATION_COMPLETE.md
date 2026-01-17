@@ -100,9 +100,12 @@ Your app is now ready to:
 
 ## What You Get
 
-A fully functional, responsive checkers game with:
+What you get:
 - ✅ Mobile-ready design (works in Pi Browser)
 - ✅ AI opponent (3 difficulty levels)
+   - Beginner: Random moves
+   - Intermediate: Minimax algorithm (depth = 1) with positional weighting (center control, king's row, etc.)
+   - Advanced: Minimax algorithm (depth > 1) with alpha-beta pruning and full positional scoring
 - ✅ Pi SDK integration
 - ✅ Beautiful themes
 - ✅ Sound effects

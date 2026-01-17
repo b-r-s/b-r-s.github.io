@@ -103,6 +103,12 @@ The Express server will serve the built React app from `dist/` folder.
 
 ## Project Structure
 
+
+## AI Opponent (Single-Player)
+- Beginner: Random moves
+- Intermediate: Minimax algorithm (depth = 1) with positional weighting (center control, king's row, etc.)
+- Advanced: Minimax algorithm (depth > 1) with alpha-beta pruning and full positional scoring
+
 ```
 Checkers4Pi/
 ├── server/

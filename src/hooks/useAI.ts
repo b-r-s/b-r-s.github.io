@@ -98,10 +98,20 @@ export const useAI = () => {
       return allMoves[Math.floor(Math.random() * allMoves.length)];
     }
 
-    // INTERMEDIATE: Still random, but forces jumps because 'getAllValidMoves' only returns jumps if available.
-    // So it's a "follow the rules but don't think ahead" bot.
+    // INTERMEDIATE: Uses minimax with depth=1 (looks one move ahead)
     if (difficulty === 'intermediate') {
-      return allMoves[Math.floor(Math.random() * allMoves.length)];
+      let bestMove: Move | null = null;
+      let bestScore = -Infinity;
+
+      for (const move of allMoves) {
+        const newBoard = executeMove(board, move);
+        const score = minimax(newBoard, 1, -Infinity, Infinity, false, player);
+        if (score > bestScore) {
+          bestScore = score;
+          bestMove = move;
+        }
+      }
+      return bestMove || allMoves[0];
     }
 
     // ADVANCED: The big brain mode.

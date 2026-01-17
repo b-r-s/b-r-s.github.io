@@ -103,6 +103,11 @@ Open **Developer Tools Console** (F12) to see detailed flow:
 - ✅ Server communication (approval/completion)
 - ✅ Error handling
 
+### AI Opponent (Single-Player)
+- Beginner: Random moves
+- Intermediate: Minimax algorithm (depth = 1) with positional weighting (center control, king's row, etc.)
+- Advanced: Minimax algorithm (depth > 1) with alpha-beta pruning and full positional scoring
+
 ### Backend API
 - ✅ `/api/payments/approve` endpoint
 - ✅ `/api/payments/complete` endpoint

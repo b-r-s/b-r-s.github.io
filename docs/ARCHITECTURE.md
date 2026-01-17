@@ -55,9 +55,10 @@ checkers4pi/
 - Desktop mouse/keyboard support
 
 ### 2. AI Opponent
-- **Beginner**: Random moves
-- **Intermediate**: Rule-following
-- **Advanced**: Minimax algorithm with alpha-beta pruning
+	- **Beginner**: Random moves
+	- **Intermediate**: Minimax algorithm (depth = 1) with positional weighting (center control, king's row, etc.)
+	- **Advanced**: Minimax algorithm (depth > 1) with alpha-beta pruning and full positional scoring
+│   │   ├── scoring.ts   # Advanced scoring system (material, positional weighting)
 
 ### 3. Pi Network Integration
 - User authentication via Pi SDK
