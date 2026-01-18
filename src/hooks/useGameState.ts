@@ -54,31 +54,31 @@ export const useGameState = (
     Main state container for the game.
     We track everything here: the board, whose turn it is, scores, and time.
   */
-    const [gameState, setGameState] = useState<GameState>(() => {
-      const initialBoard = createInitialBoard();
-      const redScore = calculateScore(initialBoard, 'red');
-      const blackScore = calculateScore(initialBoard, 'black');
-      const aiLevel = getAILevelFromDifficulty(settings.difficulty);
-      const aiMovesFirst = aiLevel === 'advanced' && settings.aiMovesFirst;
-      return {
-        board: initialBoard,
-        currentPlayer: aiMovesFirst ? 'black' : 'red',
-        selectedPosition: null,
-        validMoves: [],
-        winner: null,
-        gameMode: 'PvAI',
-        isAiTurn: false,
-        aiLevel: aiLevel,
-        scores: {
-          red: redScore,
-          black: blackScore
-        },
-        turnStartTime: Date.now(),
-        totalTime: { red: 0, black: 0 },
-        moveHistory: [],
-        moveCount: 0,
-      };
-    });
+  const [gameState, setGameState] = useState<GameState>(() => {
+    const initialBoard = createInitialBoard();
+    const redScore = calculateScore(initialBoard, 'red');
+    const blackScore = calculateScore(initialBoard, 'black');
+    const aiLevel = getAILevelFromDifficulty(settings.difficulty);
+    const aiMovesFirst = aiLevel === 'advanced' && settings.aiMovesFirst;
+    return {
+      board: initialBoard,
+      currentPlayer: aiMovesFirst ? 'black' : 'red',
+      selectedPosition: null,
+      validMoves: [],
+      winner: null,
+      gameMode: 'PvAI',
+      isAiTurn: false,
+      aiLevel: aiLevel,
+      scores: {
+        red: redScore,
+        black: blackScore
+      },
+      turnStartTime: Date.now(),
+      totalTime: { red: 0, black: 0 },
+      moveHistory: [],
+      moveCount: 0,
+    };
+  });
 
   /* 
     This state locks a player into using a specific piece when they are in the 
@@ -119,16 +119,8 @@ export const useGameState = (
     return { red: redScore, black: blackScore };
   }, []);
 
-  // Clear the AI move highlight after the animation completes (1s animation + buffer)
-  useEffect(() => {
-    if (gameState.lastAIMove) {
-      const timer = setTimeout(() => {
-        setGameState(prev => ({ ...prev, lastAIMove: undefined }));
-      }, 1200); // Slightly longer than the 1s animation
-
-      return () => clearTimeout(timer);
-    }
-  }, [gameState.lastAIMove]);
+  // NOTE: lastAIMove trail is now cleared when the player selects a piece (in handleTileClick)
+  // The old auto-clear timer was removed to allow the trail to persist
 
   /*
     SHARED LOGIC: This is the heart of move execution, used by both click and drag-drop.
@@ -247,170 +239,168 @@ export const useGameState = (
   const triggerAIMove = useCallback(() => {
     // Add delay for human-like feel
     setTimeout(() => {
+      // 1. Mark as processing
       setGameState(prev => {
-        // Only execute if still AI's turn
         if (prev.currentPlayer !== 'black' || prev.gameMode !== 'PvAI' || prev.winner || prev.isAiTurn) {
           return prev;
         }
+        return { ...prev, isAiTurn: true };
+      });
 
-        // Mark as processing
-        const processingState = { ...prev, isAiTurn: true };
-        
-        const aiMove = getBestMove(prev.board, 'black', prev.aiLevel);
+      // 2. Calculate the move outside the state updater
+      const currentBoard = gameState.board;
+      const aiMove = getBestMove(currentBoard, 'black', gameState.aiLevel);
 
-        if (!aiMove) {
-          return { ...processingState, winner: 'red', isAiTurn: false };
-        }
+      if (!aiMove) {
+        setGameState(prev => ({ ...prev, winner: 'red', isAiTurn: false }));
+        return;
+      }
 
-        // Check if this is a multi-jump move
-        if (aiMove.isJump && aiMove.jumpSequence && aiMove.jumpSequence.length > 1) {
-          // Handle multi-jump with sequential animation
-          let currentBoard = prev.board;
-          let currentPos = aiMove.from;
-          let jumpIndex = 0;
+      // 3. Orchestrate execution
+      if (aiMove.isJump && aiMove.jumpSequence && aiMove.jumpSequence.length > 1) {
+        // Handle multi-jump sequence
+        let iteratedBoard = currentBoard;
+        let currentPos = aiMove.from;
+        let jumpIndex = 0;
 
-          const executeNextJump = () => {
-            if (jumpIndex >= aiMove.jumpSequence!.length) {
-              // All jumps complete
-              const elapsed = Date.now() - prev.turnStartTime;
-              const winner = checkGameOver(currentBoard);
-              const newMoveCount = prev.moveCount + 1;
+        const capturedSquares: Position[] = [];
+        const landingSquares: Position[] = [];
+        const startSquare = aiMove.from;
 
-              if (winner && onGameEnd) {
-                onGameEnd(winner, newMoveCount);
+        const executeNextJump = () => {
+          if (jumpIndex >= aiMove.jumpSequence!.length) {
+            // All jumps complete
+            const finalElapsed = Date.now() - gameState.turnStartTime;
+            const winner = checkGameOver(iteratedBoard);
+            const newMoveCount = gameState.moveCount + 1;
+
+            if (winner && onGameEnd) onGameEnd(winner, newMoveCount);
+
+            const newHistory = gameState.aiLevel === 'beginner' ? [
+              ...gameState.moveHistory,
+              {
+                move: aiMove,
+                boardBefore: currentBoard,
+                scoresBefore: gameState.scores,
+                playerBefore: 'black' as Player,
+                timeBefore: { turnStartTime: gameState.turnStartTime, totalTime: gameState.totalTime }
               }
+            ] : gameState.moveHistory;
 
-              const newMoveHistory = prev.aiLevel === 'beginner' ? [
-                ...prev.moveHistory,
-                {
-                  move: aiMove,
-                  boardBefore: prev.board,
-                  scoresBefore: prev.scores,
-                  playerBefore: prev.currentPlayer,
-                  timeBefore: {
-                    turnStartTime: prev.turnStartTime,
-                    totalTime: prev.totalTime
-                  }
-                }
-              ] : prev.moveHistory;
-
-              setGameState(prevState => ({
-                ...prevState,
-                board: currentBoard,
-                currentPlayer: 'red',
-                isAiTurn: false,
-                selectedPosition: null,
-                validMoves: [],
-                winner: winner,
-                scores: updateScores(currentBoard),
-                turnStartTime: Date.now(),
-                totalTime: { ...prevState.totalTime, black: prevState.totalTime.black + elapsed },
-                lastAIMove: undefined,
-                moveHistory: newMoveHistory,
-                moveCount: newMoveCount,
-              }));
-              return;
-            }
-
-            const landingPos = aiMove.jumpSequence![jumpIndex];
-            const jumpedRow = (currentPos.row + landingPos.row) / 2;
-            const jumpedCol = (currentPos.col + landingPos.col) / 2;
-
-            // Execute this single jump
-            const newBoard = [...currentBoard.map(row => [...row])];
-            newBoard[landingPos.row][landingPos.col] = currentBoard[currentPos.row][currentPos.col];
-            newBoard[currentPos.row][currentPos.col] = null;
-            newBoard[jumpedRow][jumpedCol] = null;
-
-            // Check for king promotion
-            const piece = newBoard[landingPos.row][landingPos.col];
-            if (piece && !piece.isKing) {
-              if ((piece.color === 'red' && landingPos.row === 0) ||
-                  (piece.color === 'black' && landingPos.row === 7)) {
-                newBoard[landingPos.row][landingPos.col] = { ...piece, isKing: true };
-                playKingSound();
-              }
-            }
-
-            playAIJumpSound();
-            currentBoard = newBoard;
-
-            // Update state to show this jump
-            setGameState(prevState => ({
-              ...prevState,
-              board: currentBoard,
+            setGameState(prev => ({
+              ...prev,
+              board: iteratedBoard,
+              currentPlayer: 'red',
+              isAiTurn: false,
+              winner,
+              scores: updateScores(iteratedBoard),
+              turnStartTime: Date.now(),
+              totalTime: { ...prev.totalTime, black: prev.totalTime.black + finalElapsed },
               lastAIMove: {
-                from: currentPos,
-                to: landingPos,
-                timestamp: Date.now()
-              }
+                from: aiMove.from,
+                to: aiMove.to,
+                timestamp: Date.now(),
+                trail: { startSquare, capturedSquares: [...capturedSquares], landingSquares: [...landingSquares] }
+              },
+              moveHistory: newHistory,
+              moveCount: newMoveCount
             }));
-
-            currentPos = landingPos;
-            jumpIndex++;
-
-            // Schedule next jump with longer pause
-            setTimeout(executeNextJump, 2000);
-          };
-
-          // Start the jump sequence with initial delay
-          playAIMoveSound();
-          setTimeout(executeNextJump, 800);
-          return prev; // Keep current state while animation runs
-        } else {
-          // Single move or single jump - execute immediately
-          playAIMoveSound();
-          const newBoard = executeMove(prev.board, aiMove);
-          const movedPiece = newBoard[aiMove.to.row][aiMove.to.col];
-          const wasPromoted = !prev.board[aiMove.from.row][aiMove.from.col]?.isKing && movedPiece?.isKing;
-          if (wasPromoted) playKingSound();
-          if (aiMove.isJump) playAIJumpSound();
-
-          const elapsed = Date.now() - prev.turnStartTime;
-          const winner = checkGameOver(newBoard);
-          const newMoveCount = prev.moveCount + 1;
-
-          if (winner && onGameEnd) {
-            onGameEnd(winner, newMoveCount);
+            return;
           }
 
-          const newMoveHistory = prev.aiLevel === 'beginner' ? [
-            ...prev.moveHistory,
-            {
-              move: aiMove,
-              boardBefore: prev.board,
-              scoresBefore: prev.scores,
-              playerBefore: prev.currentPlayer,
-              timeBefore: {
-                turnStartTime: prev.turnStartTime,
-                totalTime: prev.totalTime
-              }
-            }
-          ] : prev.moveHistory;
+          const landingPos = aiMove.jumpSequence![jumpIndex];
+          const jumpedRow = (currentPos.row + landingPos.row) / 2;
+          const jumpedCol = (currentPos.col + landingPos.col) / 2;
 
-          return {
+          capturedSquares.push({ row: jumpedRow, col: jumpedCol });
+          landingSquares.push(landingPos);
+
+          const newBoard = [...iteratedBoard.map(row => [...row])];
+          newBoard[landingPos.row][landingPos.col] = iteratedBoard[currentPos.row][currentPos.col];
+          newBoard[currentPos.row][currentPos.col] = null;
+          newBoard[jumpedRow][jumpedCol] = null;
+
+          const piece = newBoard[landingPos.row][landingPos.col];
+          if (piece && !piece.isKing) {
+            if (piece.color === 'black' && landingPos.row === 7) {
+              newBoard[landingPos.row][landingPos.col] = { ...piece, isKing: true };
+              playKingSound();
+            }
+          }
+
+          playAIJumpSound();
+          iteratedBoard = newBoard;
+
+          setGameState(prev => ({
             ...prev,
-            board: newBoard,
-            currentPlayer: 'red',
-            isAiTurn: false,
-            selectedPosition: null,
-            validMoves: [],
-            winner: winner,
-            scores: updateScores(newBoard),
-            turnStartTime: Date.now(),
-            totalTime: { ...prev.totalTime, black: prev.totalTime.black + elapsed },
+            board: iteratedBoard,
             lastAIMove: {
-              from: aiMove.from,
-              to: aiMove.to,
-              timestamp: Date.now()
-            },
-            moveHistory: newMoveHistory,
-            moveCount: newMoveCount,
-          };
-        }
-      });
+              from: currentPos,
+              to: landingPos,
+              timestamp: Date.now(),
+              trail: { startSquare, capturedSquares: [...capturedSquares], landingSquares: [...landingSquares] }
+            }
+          }));
+
+          currentPos = landingPos;
+          jumpIndex++;
+          setTimeout(executeNextJump, 2000);
+        };
+
+        playAIMoveSound();
+        setTimeout(executeNextJump, 800);
+      } else {
+        // Single move or single jump
+        playAIMoveSound();
+        const newBoard = executeMove(currentBoard, aiMove);
+        const movedPiece = newBoard[aiMove.to.row][aiMove.to.col];
+        if (!currentBoard[aiMove.from.row][aiMove.from.col]?.isKing && movedPiece?.isKing) playKingSound();
+        if (aiMove.isJump) playAIJumpSound();
+
+        const elapsed = Date.now() - gameState.turnStartTime;
+        const winner = checkGameOver(newBoard);
+        const newCount = gameState.moveCount + 1;
+
+        if (winner && onGameEnd) onGameEnd(winner, newCount);
+
+        const newHistory = gameState.aiLevel === 'beginner' ? [
+          ...gameState.moveHistory,
+          {
+            move: aiMove,
+            boardBefore: currentBoard,
+            scoresBefore: gameState.scores,
+            playerBefore: 'black' as Player,
+            timeBefore: { turnStartTime: gameState.turnStartTime, totalTime: gameState.totalTime }
+          }
+        ] : gameState.moveHistory;
+
+        const trail = aiMove.isJump && aiMove.jumpedPiece ? {
+          startSquare: aiMove.from,
+          capturedSquares: [aiMove.jumpedPiece],
+          landingSquares: [aiMove.to]
+        } : undefined;
+
+        setGameState(prev => ({
+          ...prev,
+          board: newBoard,
+          currentPlayer: 'red',
+          isAiTurn: false,
+          winner,
+          scores: updateScores(newBoard),
+          turnStartTime: Date.now(),
+          totalTime: { ...prev.totalTime, black: prev.totalTime.black + elapsed },
+          lastAIMove: {
+            from: aiMove.from,
+            to: aiMove.to,
+            timestamp: Date.now(),
+            trail
+          },
+          moveHistory: newHistory,
+          moveCount: newCount
+        }));
+      }
     }, 1000);
-  }, [getBestMove, updateScores, onGameEnd]);
+  }, [getBestMove, updateScores, onGameEnd, gameState]);
 
   // Trigger AI move when it becomes AI's turn - this IS appropriate for useEffect
   // because we're responding to the state changing to require AI action
@@ -472,7 +462,8 @@ export const useGameState = (
           return { ...prev, selectedPosition: { row, col }, validMoves: [] };
         }
 
-        return { ...prev, selectedPosition: { row, col }, validMoves: filteredMoves };
+        // Clear AI trail when human selects a piece
+        return { ...prev, selectedPosition: { row, col }, validMoves: filteredMoves, lastAIMove: undefined };
       }
 
       // --- MOVE EXECUTION LOGIC ---
@@ -536,7 +527,7 @@ export const useGameState = (
       // Undo both the AI's last move AND the human move before it
       // Get the entry from 2 moves ago (before human's last move)
       const entryToRestore = prev.moveHistory[prev.moveHistory.length - 2];
-      
+
       // Create visual feedback for the undone move (show human's move being undone)
       const undoVisual = {
         from: entryToRestore.move.to,
@@ -568,13 +559,13 @@ export const useGameState = (
     const initialBoard = createInitialBoard();
     const redScore = calculateScore(initialBoard, 'red');
     const blackScore = calculateScore(initialBoard, 'black');
-    
+
     setGameState(prev => {
       // Use the current aiLevel from game state, not from settings
       const aiLevel = prev.aiLevel;
       // AI moves first only in advanced mode when setting is enabled
       const aiMovesFirst = aiLevel === 'advanced' && settings.aiMovesFirst;
-      
+
       return {
         board: initialBoard,
         currentPlayer: aiMovesFirst ? 'black' : 'red',

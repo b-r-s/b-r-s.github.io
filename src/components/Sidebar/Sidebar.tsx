@@ -164,7 +164,7 @@ export function Sidebar({
         >
           Board
         </button>
-        
+
         {/* Play Again Overlay */}
         {showPlayAgain && (
           <button
@@ -188,7 +188,7 @@ export function Sidebar({
               {renderPlayerScore('red')}
               {renderPlayerScore('black')}
             </div>
-            
+
             {/* Undo Move Button - Only for Beginner Level */}
             {canUndo && (
               <button
@@ -242,7 +242,8 @@ export function Sidebar({
               <p className="difficulty-desc">
                 {aiLevel === 'beginner' && 'Random moves. Good for learning the rules.'}
                 {aiLevel === 'intermediate' && 'Balanced. Prioritizes captures.'}
-                {aiLevel === 'advanced' && 'Strategic. Thinks ahead and plays to win.'}
+                {aiLevel === 'advanced' && !settings.aiMovesFirst && 'Strategic. Thinks ahead and plays to win.'}
+                {aiLevel === 'advanced' && settings.aiMovesFirst && 'Maximum difficulty! The AI strikes first and plays ruthlessly.'}
               </p>
             </div>
           </>

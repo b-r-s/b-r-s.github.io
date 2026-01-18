@@ -6,21 +6,21 @@
 }
 
 .checkerboard {
-    display: grid;
-    margin-top: 9.6vw;
-    grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: repeat(8, 1fr);
-    gap: 0;
-    width: 40vw;
-    aspect-ratio: 1;
-    height: 40vw;
-    max-width: 600px;
-    max-height: 600px;
-    border-radius: 4px;
-    margin-left: 2vw;
-    touch-action: none;
-    user-select: none;
-    -webkit-user-select: none;
+  display: grid;
+  margin-top: 9.6vw;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  gap: 0;
+  width: 40vw;
+  aspect-ratio: 1;
+  height: 40vw;
+  max-width: 600px;
+  max-height: 600px;
+  border-radius: 4px;
+  margin-left: 2vw;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .board-square {
@@ -118,10 +118,92 @@ v
   }
 }
 
-/* AI Move Highlighting - More Obvious Blinking Border */
-.board-square.ai-move-highlight {
-  animation: blinkBorder 1s ease-in-out forwards;
+/* AI Jump Trail - Start Square (green border) */
+.board-square.ai-trail-start {
+  outline: 4px solid #22c55e !important;
+  outline-offset: -4px;
+  z-index: 10;
+}
+
+/* AI Jump Trail - Captured Squares (red border + Amethyst X) */
+.board-square.ai-trail-captured {
+  outline: 4px solid #ef4444 !important;
+  outline-offset: -4px;
+  z-index: 9;
+}
+
+.board-square.ai-trail-captured::before {
+  content: '' !important;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  height: 70%;
+  background-image: url('../../assets/captured-x.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.8));
+  z-index: 15;
+  visibility: visible !important;
+  display: block !important;
+}
+
+/* AI Jump Trail - Landing Squares (pulsing amethyst glow) */
+.board-square.ai-trail-landing {
+  z-index: 8;
+  animation: landing-pulse 2s ease-in-out infinite;
+}
+
+@keyframes landing-pulse {
+
+  0%,
+  100% {
+    box-shadow: inset 0 0 15px rgba(147, 51, 234, 0.4);
+  }
+
+  50% {
+    box-shadow: inset 0 0 35px rgba(147, 51, 234, 0.7);
+  }
+}
+
+/* Overlay for connecting lines using dynamic stacked gradients */
+.trail-path-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
   z-index: 5;
+  opacity: 0.9;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+/* If a square has BOTH, we'll handle it via an extra class or multiple backgrounds in inline style if needed, 
+   but for now let's just fix the directions which were the main issue. */
+
+/* AI Move Highlighting - Fix animation to stay visible */
+.board-square.ai-move-highlight {
+  animation: blinkBorderPersistent 1s ease-in-out infinite;
+  z-index: 12;
+}
+
+@keyframes blinkBorderPersistent {
+
+  0%,
+  100% {
+    outline: 5px solid #00ff00;
+    box-shadow: 0 0 20px #00ff00, inset 0 0 10px rgba(0, 255, 0, 0.3);
+  }
+
+  50% {
+    outline: 2px solid #00ff00;
+    box-shadow: 0 0 10px #00ff00;
+  }
 }
 
 /* Jump Hint Arrow for Beginner Level */
@@ -138,10 +220,13 @@ v
 }
 
 @keyframes jump-hint-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(-50%, -50%) scale(1);
     opacity: 1;
   }
+
   50% {
     transform: translate(-50%, -50%) scale(1.2);
     opacity: 0.8;
@@ -314,14 +399,23 @@ v
   }
 
   @keyframes blinkBorder {
-    0%, 25%, 50%, 75% {
+
+    0%,
+    25%,
+    50%,
+    75% {
       border: 3px solid #00ff00;
       box-shadow: 0 0 15px #00ff00, inset 0 0 15px rgba(0, 255, 0, 0.3);
     }
-    12.5%, 37.5%, 62.5%, 87.5% {
+
+    12.5%,
+    37.5%,
+    62.5%,
+    87.5% {
       border: 3px solid transparent;
       box-shadow: none;
     }
+
     100% {
       border: 3px solid transparent;
       box-shadow: none;

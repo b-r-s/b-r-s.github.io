@@ -77,6 +77,11 @@ export interface GameState {
     from: Position;
     to: Position;
     timestamp: number;
+    trail?: {
+      startSquare: Position;
+      capturedSquares: Position[];
+      landingSquares: Position[];
+    };
   };
   lastUndoMove?: {
     from: Position;
