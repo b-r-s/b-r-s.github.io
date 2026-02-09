@@ -49,4 +49,4 @@ This project is licensed under the PiOS (Pi Open Source) License.
 ## 🚀 Local Development
 1. **Clone & Install:** `git clone ... && npm install`
 2. **Sandbox Mode:** Set `REACT_APP_PI_SANDBOX=true` in `.env`.
-3. **Launch:** `npm start`
+3. **Launch:** `npm run dev`

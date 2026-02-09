@@ -77,7 +77,7 @@ checkers4pi/
 - **React 19**: Modern UI framework
 - **TypeScript**: Type-safe code
 - **Vite**: Fast build tool
-- **Tailwind CSS**: Utility-first styling
+- **Vanilla CSS**: Custom styling (Zero-framework architecture)
 - **Pi SDK**: Pi Network integration
 - **Web Audio API**: Sound effects
 
