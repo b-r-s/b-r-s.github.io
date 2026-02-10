@@ -33,6 +33,7 @@ dist-ssr
 /keep-these-files/
 
 # Pi Submission Docs (private/internal)
+/PiSubmissionDocs/
 /docs/PiSubmissionDocs/
 
 # Personal/Tax Data (per compliance rules)
