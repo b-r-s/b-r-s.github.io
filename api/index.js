@@ -1,5 +1,28 @@
 import express from 'express';
 import cors from 'cors';
+
+const app = express();
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// API Routes - Self-Contained (No external config import for the check)
+app.get(['/api/health', '/health', '/'], (req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    message: 'Server is alive (Self-Contained Mode)',
+    // We check process.env directly instead of using config.js
+    piConfigured: !!process.env.VITE_PI_API_KEY || !!process.env.PI_API_KEY
+  });
+});
+
+// Export the app for Vercel
+export default app;
+
+/* import express from 'express';
+import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import config from './config.js';
@@ -51,4 +74,4 @@ if (config.isDevelopment) {
 }
 
 // Export the app (Necessary for Vercel to turn this into a Serverless Function)
-export default app;
+export default app; */
