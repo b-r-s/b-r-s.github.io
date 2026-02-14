@@ -32,7 +32,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "api/index.js"
+      "destination": "/api/index.js"
     },
     {
       "source": "/validation-key.txt",
