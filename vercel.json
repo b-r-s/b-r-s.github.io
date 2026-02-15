@@ -14,25 +14,7 @@
       }
     }
   ],
-  "headers": [
-    {
-      "source": "/validation-key.txt",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "text/plain; charset=utf-8"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "no-store, must-revalidate"
-        }
-      ]
-    }
-  ],
+  "headers": [],
   "rewrites": [
     {
       "source": "/api/(.*)",
@@ -40,7 +22,7 @@
     },
     {
       "source": "/validation-key.txt",
-      "destination": "/validation-key.txt"
+      "destination": "/api/index.js"
     },
     {
       "source": "/(.*)",

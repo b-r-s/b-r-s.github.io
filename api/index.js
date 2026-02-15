@@ -8,6 +8,13 @@ app.use(cors());
 app.use(express.json());
 
 // API Routes - Self-Contained (No external config import for the check)
+
+// Pi Network Validation Key Route
+// Hardcoded to ensure exact response body without HTML wrapping
+app.get('/validation-key.txt', (req, res) => {
+  res.set('Content-Type', 'text/plain');
+  res.status(200).send('6ea15fed2af1a0d886e63765a');
+});
 app.get(['/api/health', '/health', '/'], (req, res) => {
   res.json({
     status: 'ok',
