@@ -14,29 +14,15 @@
       }
     }
   ],
-  "headers": [
-    {
-      "source": "/validation-key.txt",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "text/plain; charset=utf-8"
-        },
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET,HEAD,OPTIONS"
-        }
-      ]
-    }
-  ],
+  "headers": [],
   "rewrites": [
     {
       "source": "/api/(.*)",
       "destination": "/api/index.js"
+    },
+    {
+      "source": "/validation-key.txt",
+      "destination": "/validation-key.txt"
     },
     {
       "source": "/robots.txt",
