@@ -5,12 +5,12 @@ This document defines the visual standards and user interface requirements for C
 Our design uses a "Complementary-Native" approach. We use a palette that feels at home in the Pi Ecosystem (Amethyst & Gold) without exactly mimicking official system apps, maintaining our identity as an independent community project.
 
 2. Color Palette
-• Blue: Use a "Deep Indigo" or "Royal Blue" ($#1E40AF$). It feels more like a strategy game and less like a basic hyperlink blue.
-• White: Use an "Off-White" or "Ghost White" ($#F8FAFC$). Pure white ($#FFFFFF$) can be harsh on OLED phone screens at night.
-• Green: Use a "Vibrant Cyan" or "Mint Green" ($#2DD4BF$). It pops perfectly against Blue and White and makes the game feel "alive."
-• Gold: Use a "Deep Gold" or "Rich Gold" ($#B7950B$). It feels more like a strategy game and less like a basic hyperlink blue.
-• Purple: Use a "Deep Purple" or "Rich Purple" ($#6A0DAD$). It feels more like a strategy game and less like a basic hyperlink blue.
-• Red: Use a "Deep Red" or "Rich Red" ($#B7950B$). It feels more like a strategy game and less like a basic hyperlink blue.
+• Blue: Use a "Deep Indigo" or "Royal Blue" (`#1E40AF`). It feels more like a strategy game and less like a basic hyperlink blue.
+• White: Use an "Off-White" or "Ghost White" (`#F8FAFC`). Pure white (`#FFFFFF`) can be harsh on OLED phone screens at night.
+• Green: Use a "Vibrant Cyan" or "Mint Green" (`#2DD4BF`). It pops perfectly against Blue and White and makes the game feel "alive."
+• Gold: Use a "Deep Gold" or "Rich Gold" (`#B7950B`). It feels more like a strategy game and less like a basic hyperlink blue.
+• Purple: Use a "Deep Purple" or "Rich Purple" (`#6A0DAD`). It feels more like a strategy game and less like a basic hyperlink blue.
+• Red: Use a "Deep Red" or "Rich Red" (`#B7950B`). It feels more like a strategy game and less like a basic hyperlink blue.
 
 3. Layout & Responsiveness
 • Mobile-First: The app is locked to portrait orientation.

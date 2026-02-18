@@ -24,13 +24,15 @@
 
 - **Frontend:** ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?logo=typescript&logoColor=white) ![Vite](https://img.shields.io/badge/Vite-Latest-646CFF?logo=vite&logoColor=white)
 - **Deployment:** ![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white) (Optimized for Pi Browser Webviews)
-- **AI Engine:** ![Strategy](https://img.shields.io/badge/Logic-Minimax--Alpha--Beta-red) ([Strategy Doc](./docs/AI-STRATEGY.md))
+- **AI Engine:** ![Strategy](https://img.shields.io/badge/Logic-Minimax--Alpha--Beta-red)
 - **Styling:** ![CSS3](https://img.shields.io/badge/Styling-Vanilla--CSS-1572B6?logo=css3&logoColor=white) (Zero-framework architecture for high-contrast mobile play)
 
 ---
 
 ## 📚 Documentation
-- [AI Strategy & Logic](./docs/AI-STRATEGY.md)
+- [Pi Hub Ecosystem Guide (Hosting multiple games)](./docs/PI-HUB-GUIDE.md)
+- [Mission Statement & Developer Commitment](./docs/MISSION.md)
+- [Terms of Service](./docs/TERMS.md)
 - [Privacy Policy](./docs/PRIVACY.md)
 - [UI & Theme Guidelines](./docs/UI-GUIDELINES.md)
 
