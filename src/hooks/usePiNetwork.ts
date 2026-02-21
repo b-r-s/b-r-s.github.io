@@ -10,6 +10,7 @@ interface PiUser {
 export const usePiNetwork = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<PiUser | null>(null);
+  const [paymentStatus, setPaymentStatus] = useState<'idle' | 'pending' | 'success' | 'cancelled' | 'error'>('idle');
 
   // Initialize Pi SDK instance
   const pi = useMemo(() => {
@@ -73,10 +74,48 @@ export const usePiNetwork = () => {
     }
   };
 
+  const createPayment = async (amount: number, memo: string) => {
+    if (!pi) {
+      console.error('Pi SDK not initialized');
+      return;
+    }
+    setPaymentStatus('pending');
+    try {
+      await pi.createPayment(
+        { amount, memo, metadata: { source: 'tip_developer' } },
+        {
+          onReadyForServerApproval: (paymentId: string) => {
+            console.log('Payment ready for approval:', paymentId);
+            // For a simple tip, we approve immediately client-side
+            // In a full backend setup you would call your server here
+          },
+          onReadyForServerCompletion: (paymentId: string, txid: string) => {
+            console.log('Payment complete! paymentId:', paymentId, 'txid:', txid);
+            setPaymentStatus('success');
+          },
+          onCancel: (paymentId: string) => {
+            console.log('Payment cancelled:', paymentId);
+            setPaymentStatus('cancelled');
+          },
+          onError: (error: any, payment: any) => {
+            console.error('Payment error:', error, payment);
+            setPaymentStatus('error');
+          },
+        }
+      );
+    } catch (error) {
+      console.error('createPayment threw:', error);
+      setPaymentStatus('error');
+    }
+  };
+
   return {
     pi,
     isAuthenticated,
     user,
     authenticate,
+    createPayment,
+    paymentStatus,
+    resetPaymentStatus: () => setPaymentStatus('idle'),
   };
 };

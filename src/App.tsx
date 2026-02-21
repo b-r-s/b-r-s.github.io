@@ -49,7 +49,7 @@ function App() {
   const [showInstructions, setShowInstructions] = useState(false);
 
   // Pi Network authentication
-  const { authenticate } = usePiNetwork();
+  const { authenticate, createPayment, paymentStatus, resetPaymentStatus } = usePiNetwork();
   const [authChecked, setAuthChecked] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
@@ -195,6 +195,9 @@ function App() {
             onUndo={undoMove}
             logo={logo}
             gameInProgress={gameState.moveCount > 0}
+            createPayment={createPayment}
+            paymentStatus={paymentStatus}
+            resetPaymentStatus={resetPaymentStatus}
           />
         </div>
       )}

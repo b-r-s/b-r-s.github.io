@@ -18,13 +18,15 @@ export interface SidebarProps {
   settings: GameSettings;
   onSettingsChange: (settings: Partial<GameSettings>) => void;
   showPlayAgain?: boolean;
-
   canUndo?: boolean;
   onUndo?: () => void;
   logo?: string;
   gameInProgress?: boolean;
   onRestart?: () => void;
   moveHistory?: import('../../types/game').MoveHistoryEntry[];
+  createPayment?: (amount: number, memo: string) => Promise<void>;
+  paymentStatus?: 'idle' | 'pending' | 'success' | 'cancelled' | 'error';
+  resetPaymentStatus?: () => void;
 }
 
 // Helper to format milliseconds to MM:SS
@@ -45,15 +47,17 @@ export function Sidebar({
   settings,
   onSettingsChange,
   showPlayAgain,
-
   canUndo,
   onUndo,
   logo,
   gameInProgress,
   onRestart,
-  moveHistory = []
+  moveHistory = [],
+  createPayment,
+  paymentStatus = 'idle',
+  resetPaymentStatus,
 }: SidebarProps) {
-  const [activeTab, setActiveTab] = useState<'game' | 'settings' | 'colors' | 'board'>('game');
+  const [activeTab, setActiveTab] = useState<'game' | 'settings' | 'colors' | 'board' | 'support'>('game');
   const [currentMoveTime, setCurrentMoveTime] = useState(0);
 
   // Get winner from scores if available (winner is set when total is not 0 and the other is 0 or game is over)
@@ -196,8 +200,13 @@ export function Sidebar({
           onClick={() => setActiveTab('board')}
           className='tab-button'
         />
-
-
+        <GameButton
+          hue={NeonColors.Gold}
+          hoverHue={NeonColors.Purple}
+          label='π Support'
+          onClick={() => { setActiveTab('support'); resetPaymentStatus?.(); }}
+          className='tab-button'
+        />
       </div>
 
       {/* Content */}
@@ -330,6 +339,49 @@ export function Sidebar({
                   </button>
                 );
               })}
+            </div>
+          </>
+        ) : activeTab === 'support' ? (
+          <>
+            <h2 className="sidebar-title">Support This App</h2>
+            <div className="settings-content">
+              <p className="difficulty-desc">
+                Checkers4Pi is free, always. If you enjoy it,
+                send a small tip in Test Pi — it costs you nothing real
+                and helps confirm Pi ecosystem connectivity. 🙏
+              </p>
+              {paymentStatus === 'idle' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {[0.1, 0.5, 1].map((amt) => (
+                    <button
+                      key={amt}
+                      className="difficulty-btn"
+                      onClick={() => createPayment?.(amt, `Tip for Checkers4Pi — Thank you!`)}
+                      disabled={!createPayment}
+                    >
+                      π {amt} — Tip the Developer
+                    </button>
+                  ))}
+                </div>
+              )}
+              {paymentStatus === 'pending' && (
+                <p className="difficulty-desc" style={{ color: '#f0b90b' }}>⏳ Processing payment in Pi Browser…</p>
+              )}
+              {paymentStatus === 'success' && (
+                <p className="difficulty-desc" style={{ color: '#00c853' }}>✅ Thank you! Your tip was received. 🎉</p>
+              )}
+              {paymentStatus === 'cancelled' && (
+                <>
+                  <p className="difficulty-desc" style={{ color: '#888' }}>Payment cancelled. No Pi was sent.</p>
+                  <button className="difficulty-btn" onClick={resetPaymentStatus}>Try Again</button>
+                </>
+              )}
+              {paymentStatus === 'error' && (
+                <>
+                  <p className="difficulty-desc" style={{ color: '#ff5252' }}>❌ Something went wrong. Please try again.</p>
+                  <button className="difficulty-btn" onClick={resetPaymentStatus}>Try Again</button>
+                </>
+              )}
             </div>
           </>
         ) : null}
