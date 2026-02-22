@@ -1,0 +1,588 @@
+:root {
+  --bg-dark: #33124e;
+  --bg-medium: #5f2c89;
+  --bg-light: #c28ded;
+  --bg-blue: #170c82;
+  --border-dark: #ee6705;
+  --border-medium: #ec8236;
+  --border-light: #f6934c;
+  --btn-hue: 285;
+}
+
+/* ==========================================================================
+   Base Styles (Mobile First)
+   Default for small screens (e.g., iPhone SE)
+   ========================================================================== */
+
+.sidebar {
+  background-color: var(--bg-medium);
+  border-radius: var(--radius-lg);
+  /* padding: 0.4rem;
+  margin-top: 0.5vh; */
+  width: 100%;
+  box-sizing: border-box;
+  max-height: 55vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  /* gap: 0.4rem; */
+  border: 1px solid var(--accent-dark);
+}
+
+.sidebar-tabs {
+  display: flex;
+  flex-shrink: 0;
+  gap: 0.1rem;
+  padding: 0.15rem;
+  border-radius: var(--radius-md);
+  position: relative;
+  background-color: var(--bg-dark);
+}
+
+.tab-button {
+  flex: 1;
+  padding: 0.25rem 0.1rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  text-align: center;
+  min-width: 0 !important;
+  width: auto !important;
+  min-height: 32px;
+}
+
+.sidebar-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+  background-color: var(--bg-medium);
+  animation: fadeIn 0.3s ease;
+  padding-bottom: 20px;
+}
+
+/* Custom Scrollbar for Mobile */
+.sidebar-content::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  display: block !important;
+}
+
+.sidebar-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  margin: 4px 0;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+  background-color: var(--border-light);
+  border-radius: 10px;
+  border: 1px solid var(--bg-medium);
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-header-with-logo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.sidebar-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 2vh;
+}
+
+.sidebar-logo {
+  width: 60px;
+  /* Smaller base for mobile */
+  height: 60px;
+  object-fit: contain;
+  flex-shrink: 0;
+  margin-left: 1vw;
+  margin-top: -2vh;
+}
+
+.sidebar-title {
+  margin: 0;
+  font-size: 1rem;
+  /* Base size as requested */
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+  padding-left: 2vw;
+  margin-bottom: 0.4rem;
+}
+
+.match-stats-container {
+  display: flex;
+  flex-direction: column;
+  /* overflow: hidden; */
+  /* gap: 0.4rem; */
+}
+
+.player-score-card {
+  padding: 0.4rem;
+  border-radius: var(--radius-md);
+  transition: all 0.3s ease;
+  margin-bottom: 0.4rem;
+  overflow-x: hidden;
+}
+
+.player-score-card.active {
+  background-color: rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.05);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.3rem;
+}
+
+.player-name {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.sidebar-stat-breakdown {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+
+.sidebar-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 45px;
+}
+
+.sidebar-stat-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sidebar-stat-value {
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--text-primary);
+  background: var(--bg-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: 6px;
+  margin-top: 2px;
+  padding: 0.1em 0.4em;
+}
+
+.timer-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1rem;
+  color: var(--text-primary);
+  font-family: monospace;
+}
+
+button.game-button.tab-button {
+  height: 34px !important;
+  font-size: 1rem !important;
+}
+
+button.game-button.new-game-btn {
+  width: 120px !important;
+  height: 34px !important;
+}
+
+.difficulty-btn {
+  width: 100%;
+  padding: 0.45rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.difficulty-btn.active {
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  border: 2px solid var(--accent-dark);
+  font-weight: 800;
+}
+
+.difficulty-desc {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-top: 0.5rem;
+  text-align: center;
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+
+.settings-content {
+  margin-top: 2vh;
+  padding: 0.5rem;
+}
+
+/* Play Again Overlay Button */
+.play-again-overlay-btn {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: var(--radius-md);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s ease;
+  animation: slideInFromTop 0.5s ease-out;
+  letter-spacing: 0.5px;
+}
+
+/* AI Moves First Toggle */
+.ai-first-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: var(--radius-md);
+  margin-top: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.ai-first-toggle input[type="checkbox"] {
+  accent-color: #ef4444;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.ai-first-toggle.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ai-first-toggle.disabled input[type="checkbox"] {
+  cursor: not-allowed;
+}
+
+.ai-first-toggle .toggle-hint {
+  font-size: 1rem;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+/* Undo Move Button */
+.undo-move-btn {
+  width: 80%;
+  background-color: var(--bg-dark);
+  border-color: var(--border-dark);
+  color: var(--text-primary);
+  padding: .35rem 0 .35rem 0;
+  margin-top: 0.5rem;
+  margin-right: 2rem;
+  margin-left: 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.undo-move-btn:active {
+  transform: translateY(0);
+}
+
+/* New Game Button (Mini) */
+.btn-new-game-mini {
+  padding: 0.35rem 0.6rem;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.btn-new-game-mini:active {
+  transform: translateY(0);
+}
+
+/* ==========================================================================
+   Medium Screens (Tablets, 768px+)
+   ========================================================================== */
+
+@media (min-width: 768px) {
+  .sidebar {
+    padding: 0.75rem;
+    gap: 0.75rem;
+    margin-top: 1.8vh;
+    max-height: 96%;
+    min-width: 250px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .tab-button {
+    padding: 0.6rem 0.4rem !important;
+    font-size: 0.85rem !important;
+  }
+
+  .sidebar-header-with-logo {
+    margin-bottom: 0.5rem;
+  }
+
+  .sidebar-title-group {
+    padding-top: 4vh;
+  }
+
+  .sidebar-logo {
+    width: 80px;
+    height: 80px;
+    margin-top: -4vh;
+    margin-left: 2vw;
+  }
+
+  .sidebar-title {
+    font-size: 1rem;
+    padding-left: 3vw;
+    text-align: center;
+    position: relative;
+  }
+
+  .player-name {
+    font-size: 1rem;
+  }
+
+  .sidebar-stat-breakdown {
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: nowrap;
+  }
+
+  .sidebar-stat {
+    min-width: 60px;
+  }
+
+  .sidebar-stat-label {
+    font-size: 1rem;
+  }
+
+  .sidebar-stat-value {
+    font-size: 1.1rem;
+    margin-top: 4px;
+    padding: 0.1em 0.6em;
+  }
+
+  .timer-row {
+    font-size: 1rem;
+  }
+
+  .difficulty-btn {
+    padding: 0.6rem;
+    font-size: 1rem;
+  }
+
+  .difficulty-desc {
+    font-size: 1rem;
+  }
+
+  .settings-content {
+    margin-top: 5vh;
+    padding: 1rem 0.5rem;
+  }
+}
+
+/* ==========================================================================
+   Large Screens (Desktop, 1024px+)
+   ========================================================================== */
+
+@media (min-width: 1024px) {
+  .sidebar {
+    min-width: 300px;
+    max-width: 350px;
+    position: sticky;
+    top: 1rem;
+    margin: 0;
+  }
+
+  .sidebar-title {
+    font-size: 1.25rem;
+    /* Desktop size as requested */
+    text-align: left;
+  }
+
+  .tab-button {
+    font-size: 1rem !important;
+  }
+}
+
+/* ==========================================================================
+   Utility & Interaction Styles
+   ========================================================================== */
+
+.tooltip-container {
+  position: relative;
+  cursor: help;
+}
+
+.sidebar-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  display: flex;
+  flex-wrap: wrap;
+  width: max-content;
+  min-width: 120px;
+  max-width: 200px;
+  text-align: center;
+  border-radius: 8px;
+  padding: 8px 12px;
+  position: absolute;
+  z-index: 100;
+  left: 50%;
+  bottom: 125%;
+  transform: translateX(-50%);
+  font-size: 1rem;
+  line-height: 1.2;
+  pointer-events: none;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+@media (hover: hover) {
+  .tooltip-container:hover .sidebar-tooltip {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) translateY(-2px);
+  }
+
+  .game-button.tab-button:hover {
+    transform: translateY(-4px) scale(1.03);
+    filter: brightness(1.6);
+    box-shadow: -2px 8px 18px oklch(0.58 0.26 355.79 / 0.79), 1px 1px 51px 0px oklch(0.68 0.32 352.44 / 0.6), -7px 10px 100px oklch(0.67 0.3 4.01 / 0.49);
+    background: var(--button-bg);
+    border: #f7f7f7d6 solid 1px;
+  }
+
+  .difficulty-btn:hover {
+    background: var(--accent-light);
+  }
+
+  .undo-move-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .sidebar-tab:hover,
+  .sidebar-tab:focus {
+    color: var(--bg-dark);
+    background: var(--border-light);
+  }
+
+  .play-again-overlay-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .ai-first-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+
+  .sidebar-tab,
+  .difficulty-btn {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.sidebar-tab.active {
+  box-shadow: 0 0 0 2px var(--border-dark);
+  background: #1a820c;
+  color: var(--text-primary);
+}
+
+.sidebar-tab:active {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.color-indicator {
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.board-color-indicator {
+  display: flex;
+  gap: 3px;
+  margin-right: 8px;
+}
+
+.board-color-circle {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid black;
+  background: var(--circle-bg);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,139 @@
+/* Wrapper styles */
+/* Wrapper styles - absolute overlay */
+div.checker-piece {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto;
+  z-index: 5;
+  transition: transform 0.2s ease;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+div.checker-piece.king {
+  z-index: 10;
+}
+
+div.checker-piece.draggable {
+  cursor: grab;
+}
+
+div.checker-piece.draggable:active {
+  cursor: grabbing;
+}
+
+/* Image styles */
+img.checker-piece {
+  width: 75%;
+  height: 75%;
+  pointer-events: none;
+  display: block;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
+/*   filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.3)); */
+}
+
+/* King Override */
+div.checker-piece.king img.checker-piece {
+  width: 100%;
+  height: 100%;
+  transform: scale(1.2) translateY(-10%);
+/*   filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.5)); */
+}
+
+/* Animation state */
+.checker-piece.animating {
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Jump animation */
+@keyframes jump {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-40px);
+  }
+}
+
+.checker-piece.jumping {
+  animation: jump 0.6s ease-in-out;
+}
+
+.checker-piece.selected {
+   box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.6); 
+  z-index: 20;
+}
+
+.drag-ghost {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  width: 80px;
+  height: 80px;
+  opacity: 1;
+  pointer-events: none;
+}
+
+/* Mobile Touch Improvements */
+@media (hover: none) and (pointer: coarse) {
+  div.checker-piece.draggable {
+    cursor: pointer;
+  }
+
+  div.checker-piece.draggable:active {
+    transform: scale(1.1);
+  }
+
+  img.checker-piece {
+/*     filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.3)); */
+  }
+
+  div.checker-piece.king img.checker-piece {
+/*     filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.5)); */
+  }
+}
+
+@media (max-width: 768px) {
+  img.checker-piece {
+    width: 80%;
+    height: 80%;
+  }
+
+  div.checker-piece.king img.checker-piece {
+    width: 105%;
+    height: 105%;
+    transform: scale(1.25) translateY(-8%);
+  }
+}
+
+@media (max-width: 480px) {
+  img.checker-piece {
+    width: 85%;
+    height: 85%;
+  }
+
+  div.checker-piece.king img.checker-piece {
+    width: 110%;
+    height: 110%;
+    transform: scale(1.2) translateY(-6%);
+  }
+
+  @keyframes jump {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+}

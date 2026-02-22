@@ -1,0 +1,1 @@
+export { AdvantageBar } from './AdvantageBar';

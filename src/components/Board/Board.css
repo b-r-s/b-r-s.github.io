@@ -1,0 +1,339 @@
+/* ==========================================================================
+   Base Styles (Mobile First)
+   Default for small screens (e.g., iPhone SE)
+   ========================================================================== */
+
+.board-with-advantage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkerboard {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  gap: 2px;
+  width: 80vw;
+  /* Standard mobile size */
+  aspect-ratio: 1;
+  height: 80vw;
+  margin-top: 0.25rem;
+  border-radius: 4px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  /* No default left margin on mobile to prevent overflow */
+}
+
+.board-square {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.board-square.light {
+  background: var(--board-light);
+}
+
+.board-square.dark {
+  background: var(--board-dark);
+}
+
+.board-square.valid-move::after,
+.board-square.hover-valid-move::after {
+  content: '';
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Toast Notification (Mobile First) */
+.toast-notification {
+  position: absolute;
+  top: 3%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  border: 2px solid var(--accent-light);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  z-index: 2000;
+  box-shadow: 0 4px 6px var(--accent-dark);
+  pointer-events: none;
+  animation: fadeInOut 3s ease-in-out forwards;
+  text-align: center;
+  max-width: 90vw;
+  /* Crucial for overflow */
+  white-space: normal;
+  /* Allow wrapping */
+}
+
+.jump-hint-arrow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 6vw;
+  pointer-events: none;
+  z-index: 8;
+  animation: jump-hint-pulse 1s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   Medium Screens (Tablets, 768px+)
+   ========================================================================== */
+
+@media (min-width: 768px) {
+  .checkerboard {
+    width: 85vw;
+    height: 85vw;
+    margin-top: 0.5rem;
+  }
+
+  .board-square.valid-move::after,
+  .board-square.hover-valid-move::after {
+    width: 40%;
+    height: 40%;
+  }
+
+  .toast-notification {
+    font-size: 0.95rem;
+    padding: 10px 20px;
+    top: 5%;
+  }
+}
+
+/* ==========================================================================
+   Large Screens (Desktop, 1024px+)
+   ========================================================================== */
+
+@media (min-width: 1024px) {
+  .checkerboard {
+    width: 40vw;
+    height: 40vw;
+    max-width: 600px;
+    max-height: 600px;
+    margin-left: 2vw;
+    margin-top: 9.6vw;
+  }
+
+  .toast-notification {
+    font-size: 1.1rem;
+    padding: 12px 24px;
+    top: 15%;
+    white-space: nowrap;
+  }
+
+  .jump-hint-arrow {
+    font-size: 2.5vw;
+  }
+}
+
+/* ==========================================================================
+   Shared Animations & Trails
+   ========================================================================== */
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+
+  10% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  90% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+}
+
+@keyframes jump-hint-pulse {
+
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+.board-square.ai-move-highlight {
+  animation: blinkBorderPersistent 1s ease-in-out infinite;
+  z-index: 12;
+}
+
+@keyframes blinkBorderPersistent {
+
+  0%,
+  100% {
+    outline: 5px solid #00ff00;
+    box-shadow: 0 0 20px #00ff00, inset 0 0 10px rgba(0, 255, 0, 0.3);
+  }
+
+  50% {
+    outline: 2px solid #00ff00;
+    box-shadow: 0 0 10px #00ff00;
+  }
+}
+
+.board-square.jump-available {
+  animation: jump-available-pulse 1.5s ease-in-out infinite;
+  z-index: 12;
+  outline: 3px solid var(--jump-highlight-color, #92ef7a);
+  outline-offset: 0px;
+}
+
+@keyframes jump-available-pulse {
+
+  0%,
+  100% {
+    box-shadow: inset 0 0 10px rgba(146, 239, 122, 0.5);
+    border: 2px solid rgba(146, 239, 122, 0.6);
+  }
+
+  50% {
+    box-shadow: inset 0 0 30px rgba(146, 239, 122, 0.8);
+    border: 4px solid rgba(146, 239, 122, 1);
+  }
+}
+
+/* AI Jump Trails and Explosions */
+.board-square.ai-trail-start {
+  outline: 4px solid #22c55e !important;
+  outline-offset: -4px;
+  z-index: 10;
+}
+
+.board-square.ai-trail-captured {
+  outline-offset: -4px;
+  z-index: 9;
+}
+
+.board-square.ai-trail-captured::after {
+  content: '' !important;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  height: 70%;
+  background: radial-gradient(circle, rgba(20, 10, 5, 0.7) 0%, rgba(0, 0, 0, 0) 70%) !important;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10;
+  display: block !important;
+}
+
+.board-square.ai-trail-captured::before {
+  content: '💥' !important;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3.5rem;
+  z-index: 25;
+  pointer-events: none;
+  animation: explosion-burst 1s ease-out forwards;
+  visibility: visible !important;
+  display: block !important;
+}
+
+@keyframes explosion-burst {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 0;
+    filter: brightness(2);
+  }
+
+  20% {
+    transform: translate(-50%, -50%) scale(1.4);
+    opacity: 1;
+    filter: brightness(1.5);
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+  }
+}
+
+.board-square.ai-trail-landing {
+  z-index: 8;
+  animation: landing-pulse 2s ease-in-out infinite;
+}
+
+@keyframes landing-pulse {
+
+  0%,
+  100% {
+    box-shadow: inset 0 0 15px rgba(147, 51, 234, 0.4);
+  }
+
+  50% {
+    box-shadow: inset 0 0 35px rgba(147, 51, 234, 0.7);
+  }
+}
+
+.trail-path-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0.9;
+  background-repeat: no-repeat;
+  background-image: var(--trail-gradients);
+  background-size: var(--trail-sizes, 100% 100%);
+  background-position: var(--trail-positions);
+}
+
+/* Touch Interaction Improvements */
+@media (hover: none) and (pointer: coarse) {
+  .board-square {
+    cursor: pointer;
+  }
+
+  .board-square:active {
+    transition: background-color 0.1s;
+  }
+}

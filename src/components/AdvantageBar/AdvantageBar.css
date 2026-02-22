@@ -1,0 +1,103 @@
+/* ==========================================================================
+   Base Styles (Mobile First)
+   Default for small screens (e.g., iPhone SE)
+   ========================================================================== */
+
+.advantage-bar-container {
+  position: relative;
+  border-radius: 12px;
+  margin-left: 2vw;
+  /* Reduced from 4vw for mobile screen space */
+}
+
+.advantage-bar {
+  width: 20px;
+  /* Base width for mobile */
+  width: 22px;
+  height: 79vw;
+  max-height: 600px;
+  background: linear-gradient(to bottom, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  border: 1px white solid;
+  flex-direction: column;
+}
+
+.advantage-fill-red {
+  height: var(--fill-height);
+  background: var(--fill-bg);
+  transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  position: relative;
+}
+
+.advantage-fill-red::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3) 0%, transparent 100%);
+  border-radius: 12px 12px 0 0;
+}
+
+.advantage-fill-black {
+  height: var(--fill-height);
+  background: linear-gradient(to top, #171717 0%, #404040 50%, #171717 100%);
+  transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  position: relative;
+}
+
+.advantage-fill-black::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
+  border-radius: 0 0 12px 12px;
+}
+
+.advantage-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.85);
+  color: var(--text-primary);
+  padding: 3px 6px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  min-width: 28px;
+  text-align: center;
+  z-index: 10;
+}
+
+/* ==========================================================================
+   Medium Screens (Tablets, 768px+)
+   ========================================================================== */
+
+@media (min-width: 768px) {
+  .advantage-bar-container {
+    margin-left: 4vw;
+    /* Restore desktop spacing */
+  }
+
+  .advantage-bar {
+    width: 24px;
+    /* Slightly wider for tablet/desktop */
+  }
+
+  .advantage-indicator {
+    font-size: 12px;
+    padding: 4px 8px;
+    min-width: 32px;
+  }
+}

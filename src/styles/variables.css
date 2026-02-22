@@ -1,0 +1,71 @@
+:root {
+  /* 
+   * THEME: Cyber-Purple
+   * PALETTE: OKLCH (Perceptual Uniformity)
+   */
+
+  /* Backgrounds - 3-Tier Hierarchy */
+  /* Darkest: Main Container (Deep Purple) */
+  --theme-bg-dark: #33124e;
+
+  /* Medium: Nested Container (Rich Purple) */
+  --theme-bg-medium: oklch(25% 0.10 285);
+
+  /* Light: Inner Container (Bright Purple surface) */
+  --theme-bg-light: oklch(35% 0.12 285);
+
+  /* Accents */
+  --theme-accent-neon-pink: oklch(75% 0.322 328);
+
+  /* Text */
+  /* Main Text: Near White (Cool toned) */
+  --theme-text-main: oklch(98% 0.01 240);
+  /* Muted Text */
+  --theme-text-muted: oklch(75% 0.05 280);
+
+  /* Board Colors */
+  --board-white: oklch(95% 0.02 240);
+  --board-blue: oklch(45% 0.20 250);
+
+  /*theme colors*/
+
+  /* 2. Used in: background-color: var(--color-neon-pink) */
+  /* Using the gradient version for a 3D glass tube effect */
+  --color-neon-pink: linear-gradient(to bottom,
+      oklch(75% 0.322 328),
+      oklch(65% 0.322 328));
+
+  /* 3. Used in: border: 2px solid var(--color-neon-pink-core) */
+  /* Making this much lighter (90%) creates the 'filament' look */
+  --color-neon-pink-core: oklch(90% 0.1 328);
+
+  /* 4. Used in: box-shadow: var(--glow-neon-pink) */
+  --glow-neon-pink:
+    0 0 10px oklch(var(--neon-pink-raw) / 0.8),
+    0 0 30px oklch(var(--neon-pink-raw) / 0.4),
+    0 0 60px oklch(var(--neon-pink-raw) / 0.2);
+
+  /* Helper for text-shadow calc */
+  --neon-pink-hue: 328;
+}
+
+/* Helper variables for your text-shadow calc 
+  --neon-pink-lightness: 70%;
+  --neon-pink-chroma: 0.322;
+  --neon-pink-hue: 328;
+
+  --neon-pink: linear-gradient(to bottom,
+    oklch(75% var(--neon-pink-chroma) var(--neon-pink-hue)),
+    oklch(65% var(--neon-pink-chroma) var(--neon-pink-hue)));
+
+  --btn-bg-light: 12% 0.03 260;
+  --btn-bg-dark: oklch(12% 0.05 300);*/
+
+
+
+/* 0 0 10px oklch(70% 0.322 328 / 0.8),*/
+/* Inner glow */
+/* 0 0 30px oklch(70% 0.322 328 / 0.4),*/
+/* Outer atmospheric bloom */
+/* 0 0 60px oklch(70% 0.322 328 / 0.2);*/
+/* Soft environmental bleed */

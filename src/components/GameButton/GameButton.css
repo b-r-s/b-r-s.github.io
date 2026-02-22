@@ -1,0 +1,43 @@
+.game-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
+  min-width: 120px;
+  padding: 0.8rem 1.5rem;
+
+  /* Use the injected variable with a fallback to 328 */
+  --hue: var(--btn-hue, 328);
+
+  /* Update background to use the variable */
+  background: linear-gradient(180deg,
+      oklch(30% 0.15 var(--hue)) 0%,
+      oklch(15% 0.1 var(--hue)) 100%);
+
+  /* Use the raw variable for the box-shadows too */
+  border: 2px solid oklch(90% 0.1 var(--hue));
+
+  box-shadow:
+    0 0 10px oklch(70% 0.322 var(--hue) / 0.8),
+    0 0 30px oklch(70% 0.322 var(--hue) / 0.4);
+
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (hover: hover) {
+  .game-button:hover {
+    transform: translateY(-4px) scale(1.03);
+    filter: brightness(1.2);
+
+    /* Update hover shadows to use the variable */
+    box-shadow:
+      0 0 18px oklch(70% 0.322 var(--hue) / 0.9),
+      0 0 50px oklch(70% 0.322 var(--hue) / 0.6),
+      0 0 100px oklch(70% 0.322 var(--hue) / 0.3);
+  }
+}
