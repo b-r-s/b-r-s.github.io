@@ -5,6 +5,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pi Game Hub - By b-r-s</title>
+    <!-- Pi SDK: must init at the registered App URL so auth works in subpath games -->
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <script>
+      var piReady = false;
+      window.addEventListener('load', function () {
+        try {
+          if (window.Pi) {
+            window.Pi.init({ version: '2.0', sandbox: true });
+            piReady = true;
+            var status = document.getElementById('pi-status');
+            if (status) {
+              status.textContent = 'Pi Network: Connected';
+              status.style.color = '#f0b90b';
+            }
+          }
+        } catch (e) {
+          console.warn('Pi Hub init error:', e);
+        }
+      });
+
+      function launchGame(url, event) {
+        event.preventDefault();
+        // Small delay ensures Pi.init has completed before the game page loads
+        setTimeout(function () { window.location.href = url; }, 120);
+      }
+    </script>
     <style>
         :root {
             --primary: #f0b90b;
@@ -91,7 +117,7 @@
         <h1>Pi Game Hub</h1>
         <p>Verified high-utility strategy games for the Pi Network community.</p>
 
-        <a href="/checkers/" class="game-card">
+        <a href="/checkers/" class="game-card" onclick="launchGame('/checkers/', event)">
             <span>Checkers4Pi</span>
             <span class="badge">Live</span>
         </a>
@@ -103,6 +129,9 @@
 
         <div class="footer">
             Domain Verified &bull; Built for Pioneers
+        </div>
+        <div class="footer" id="pi-status" style="margin-top:0.5rem; color: #474d57;">
+            Initializing Pi Network&hellip;
         </div>
     </div>
 </body>
