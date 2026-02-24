@@ -71,6 +71,7 @@ export const usePiNetwork = () => {
       }
     } catch (error) {
       console.error('Authentication error:', error);
+      throw error; // Re-throw so callers (App.tsx) can handle it
     }
   };
 

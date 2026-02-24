@@ -59,6 +59,7 @@ checkers4pi/
 	- **Intermediate**: Minimax algorithm (depth = 1) with positional weighting (center control, king's row, etc.)
 	- **Advanced**: Minimax algorithm (depth > 1) with alpha-beta pruning and full positional scoring
 │   │   ├── scoring.ts   # Advanced scoring system (material, positional weighting)
+	- In Advanced mode, there is an option to allow the AI to play first -- this increases the difficulty of the game.
 
 ### 3. Pi Network Integration
 - User authentication via Pi SDK

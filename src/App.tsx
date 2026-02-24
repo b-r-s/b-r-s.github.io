@@ -51,24 +51,22 @@ function App() {
   // Pi Network authentication
   const { authenticate, createPayment, paymentStatus, resetPaymentStatus } = usePiNetwork();
   const [authChecked, setAuthChecked] = useState(false);
-  const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Only attempt authentication if Pi SDK is available
+    // Auth never blocks the game — Pi auth is only required for the tip/payment
+    // feature, not to play. Always resolve to the game regardless of outcome.
     if (typeof window !== 'undefined' && 'Pi' in window) {
-      authenticate()
-        .then(() => setAuthChecked(true))
-        .catch(() => {
-          setAuthChecked(true);
-          setAuthError('Authentication failed.');
-        });
-    } else if (import.meta.env.MODE === 'development') {
-      // Local dev override: skip auth, load app
-      setAuthChecked(true);
-      setAuthError(null);
+      const authTimeout = new Promise<void>(resolve =>
+        setTimeout(() => {
+          console.warn('Pi auth timed out — proceeding to game.');
+          resolve();
+        }, 8000)
+      );
+      Promise.race([authenticate(), authTimeout])
+        .finally(() => setAuthChecked(true));
     } else {
+      // No Pi SDK (dev environment or non-Pi browser) — go straight to game
       setAuthChecked(true);
-      setAuthError('Pi SDK not detected. Please use the Pi Browser or Developer Portal sandbox.');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -125,7 +123,7 @@ function App() {
   }
 
   // 2. Handle specific preview or error states
-  const currentError = previewAuth === 'failed' ? 'Authentication failed.' : authError;
+  const currentError = previewAuth === 'failed' ? 'Authentication failed.' : null;
   const isCheckingPreview = previewAuth === 'checking';
 
   if (currentError || isCheckingPreview) {
