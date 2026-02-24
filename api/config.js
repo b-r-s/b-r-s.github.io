@@ -1,10 +1,10 @@
-// No need to import/config dotenv on the frontend! 
-// Vite handles .env files automatically.
-
-const PI_APP_ID = import.meta.env.VITE_PI_APP_ID; // Use import.meta.env for Vite
-const NODE_ENV = import.meta.env.MODE || 'development';
+// Server-side config — uses process.env (Node.js / Vercel serverless)
+const PI_API_KEY = process.env.PI_API_KEY || '';
+const PI_APP_ID = process.env.PI_APP_ID || process.env.VITE_PI_APP_ID || '';
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
 export default {
+  PI_API_KEY,
   PI_APP_ID,
   NODE_ENV,
   PI_API_BASE_URL: 'https://api.minepi.com/v2',
