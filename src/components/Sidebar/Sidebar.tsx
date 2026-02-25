@@ -404,6 +404,7 @@ export function Sidebar({
               {paymentStatus === 'cancelled' && (
                 <>
                   <p className="difficulty-desc" style={{ color: '#888' }}>Payment cancelled. No Pi was sent.</p>
+                  {debugLog.length > 0 && <DebugPanel lines={debugLog} />}
                   <button className="difficulty-btn" onClick={resetPaymentStatus}>Try Again</button>
                 </>
               )}

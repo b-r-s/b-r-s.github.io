@@ -103,21 +103,23 @@ export const usePiNetwork = () => {
         { amount, memo, metadata: { source: 'tip_developer' } },
         {
           onReadyForServerApproval: (paymentId: string) => {
-            addLog(`onReadyForServerApproval: ${paymentId}`);
+            addLog(`onReadyForServerApproval: ${paymentId.slice(0,10)}...`);
+            const t0 = Date.now();
             fetch(`${apiBase}/api/payments/approve`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ paymentId }),
             })
               .then(async r => {
+                const ms = Date.now() - t0;
                 const data = await r.json();
                 if (!r.ok) {
-                  addLog(`APPROVE FAILED ${r.status}: ${JSON.stringify(data)}`);
+                  addLog(`APPROVE FAILED ${r.status} (${ms}ms): ${JSON.stringify(data).slice(0,60)}`);
                 } else {
-                  addLog(`APPROVE OK: ${JSON.stringify(data).slice(0, 80)}`);
+                  addLog(`APPROVE OK (${ms}ms)`);
                 }
               })
-              .catch(err => addLog(`APPROVE FETCH ERROR: ${err}`));
+              .catch(err => addLog(`APPROVE FETCH ERROR (${Date.now()-t0}ms): ${err}`));
           },
           onReadyForServerCompletion: (paymentId: string, txid: string) => {
             addLog(`onReadyForServerCompletion txid: ${txid}`);
