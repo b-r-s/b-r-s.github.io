@@ -97,8 +97,10 @@ export const usePiNetwork = () => {
     const Pi = getPi();
     if (!Pi) return;
     try {
-      Pi.init({ version: '2.0' });
-      console.log('[Pi] SDK init OK');
+      // sandbox: true is required for TestNet/Sandbox testing
+      // Without it Pi treats this as a mainnet app, causing payment flow mismatches
+      Pi.init({ version: '2.0', sandbox: true });
+      console.log('[Pi] SDK init OK (sandbox mode)');
     } catch (e) {
       console.warn('[Pi] SDK init error:', e);
     }

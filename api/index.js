@@ -31,7 +31,21 @@ app.get(['/api/health', '/health', '/'], (req, res) => {
   });
 });
 
-// Export the app for Vercel
+// Test endpoint: verify our PI_API_KEY can reach Pi servers
+app.get('/api/test-pi-connection', async (req, res) => {
+  const key = process.env.PI_API_KEY || '';
+  if (!key) return res.status(500).json({ error: 'No PI_API_KEY set', envKeys: Object.keys(process.env).filter(k => k.includes('PI')) });
+  try {
+    const axios = (await import('axios')).default;
+    const r = await axios.get('https://api.minepi.com/v2/payments/fake_test_id_12345', {
+      headers: { Authorization: `Key ${key}` },
+      validateStatus: () => true,
+    });
+    res.json({ piHttpStatus: r.status, piResponse: r.data, keyLength: key.length });
+  } catch (e) {
+    res.status(500).json({ error: String(e) });
+  }
+});
 export default app;
 
 /* import express from 'express';
