@@ -11,6 +11,13 @@ export const usePiNetwork = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<PiUser | null>(null);
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'pending' | 'success' | 'cancelled' | 'error'>('idle');
+  const [debugLog, setDebugLog] = useState<string[]>([]);
+
+  const addLog = (msg: string) => {
+    const ts = new Date().toISOString().slice(11, 23); // HH:MM:SS.mmm
+    console.log(`[Pi Debug ${ts}] ${msg}`);
+    setDebugLog(prev => [...prev.slice(-20), `${ts} ${msg}`]);
+  };
 
   // Initialize Pi SDK instance
   const pi = useMemo(() => {
@@ -85,13 +92,18 @@ export const usePiNetwork = () => {
       return;
     }
     setPaymentStatus('pending');
+    setDebugLog([]);
+    addLog(`createPayment called: ${amount}π "${memo}"`);
+    addLog(`window.Pi available: ${!!PiGlobal}`);
     const apiBase = import.meta.env.VITE_API_BASE_URL ?? '';
+    addLog(`apiBase: "${apiBase || '(same-domain)'}"`);
     try {
+      addLog('Calling PiGlobal.createPayment...');
       await PiGlobal.createPayment(
         { amount, memo, metadata: { source: 'tip_developer' } },
         {
           onReadyForServerApproval: (paymentId: string) => {
-            console.log('[Pi] onReadyForServerApproval paymentId:', paymentId);
+            addLog(`onReadyForServerApproval: ${paymentId}`);
             fetch(`${apiBase}/api/payments/approve`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -100,15 +112,15 @@ export const usePiNetwork = () => {
               .then(async r => {
                 const data = await r.json();
                 if (!r.ok) {
-                  console.error('[Pi] Approve failed:', r.status, data);
+                  addLog(`APPROVE FAILED ${r.status}: ${JSON.stringify(data)}`);
                 } else {
-                  console.log('[Pi] Approve success:', data);
+                  addLog(`APPROVE OK: ${JSON.stringify(data).slice(0, 80)}`);
                 }
               })
-              .catch(err => console.error('[Pi] Approve fetch error:', err));
+              .catch(err => addLog(`APPROVE FETCH ERROR: ${err}`));
           },
           onReadyForServerCompletion: (paymentId: string, txid: string) => {
-            console.log('[Pi] onReadyForServerCompletion paymentId:', paymentId, 'txid:', txid);
+            addLog(`onReadyForServerCompletion txid: ${txid}`);
             fetch(`${apiBase}/api/payments/complete`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -117,30 +129,31 @@ export const usePiNetwork = () => {
               .then(async r => {
                 const data = await r.json();
                 if (!r.ok) {
-                  console.error('[Pi] Complete failed:', r.status, data);
+                  addLog(`COMPLETE FAILED ${r.status}: ${JSON.stringify(data)}`);
                   setPaymentStatus('error');
                 } else {
-                  console.log('[Pi] Complete success:', data);
+                  addLog(`COMPLETE OK`);
                   setPaymentStatus('success');
                 }
               })
               .catch(err => {
-                console.error('[Pi] Complete fetch error:', err);
+                addLog(`COMPLETE FETCH ERROR: ${err}`);
                 setPaymentStatus('error');
               });
           },
           onCancel: (paymentId: string) => {
-            console.log('[Pi] Payment cancelled:', paymentId);
+            addLog(`onCancel: ${paymentId}`);
             setPaymentStatus('cancelled');
           },
           onError: (error: any, payment: any) => {
-            console.error('[Pi] Payment error:', error, payment);
+            addLog(`onError: ${error} payment:${JSON.stringify(payment).slice(0,60)}`);
             setPaymentStatus('error');
           },
         }
       );
+      addLog('createPayment promise resolved');
     } catch (error) {
-      console.error('[Pi] createPayment threw:', error);
+      addLog(`createPayment THREW: ${error}`);
       setPaymentStatus('error');
     }
   };
@@ -152,6 +165,7 @@ export const usePiNetwork = () => {
     authenticate,
     createPayment,
     paymentStatus,
-    resetPaymentStatus: () => setPaymentStatus('idle'),
+    debugLog,
+    resetPaymentStatus: () => { setPaymentStatus('idle'); setDebugLog([]); },
   };
 };

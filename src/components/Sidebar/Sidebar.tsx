@@ -27,6 +27,7 @@ export interface SidebarProps {
   createPayment?: (amount: number, memo: string) => Promise<void>;
   paymentStatus?: 'idle' | 'pending' | 'success' | 'cancelled' | 'error';
   resetPaymentStatus?: () => void;
+  debugLog?: string[];
 }
 
 // Helper to format milliseconds to MM:SS
@@ -56,6 +57,7 @@ export function Sidebar({
   createPayment,
   paymentStatus = 'idle',
   resetPaymentStatus,
+  debugLog = [],
 }: SidebarProps) {
   const [activeTab, setActiveTab] = useState<'game' | 'settings' | 'colors' | 'board' | 'support'>('game');
   const [currentMoveTime, setCurrentMoveTime] = useState(0);
@@ -365,7 +367,31 @@ export function Sidebar({
                 </div>
               )}
               {paymentStatus === 'pending' && (
-                <p className="difficulty-desc" style={{ color: '#f0b90b' }}>⏳ Processing payment in Pi Browser…</p>
+                <div>
+                  <p className="difficulty-desc" style={{ color: '#f0b90b' }}>⏳ Processing payment in Pi Browser…</p>
+                  {debugLog.length > 0 && (
+                    <div style={{
+                      marginTop: '8px',
+                      background: '#111',
+                      border: '1px solid #333',
+                      borderRadius: '6px',
+                      padding: '8px',
+                      maxHeight: '180px',
+                      overflowY: 'auto',
+                      fontFamily: 'monospace',
+                      fontSize: '10px',
+                      lineHeight: '1.5',
+                      color: '#aaa',
+                      textAlign: 'left',
+                    }}>
+                      {debugLog.map((line, i) => (
+                        <div key={i} style={{ color: line.includes('FAIL') || line.includes('ERROR') || line.includes('THREW') ? '#ff5252' : line.includes('OK') ? '#00c853' : '#aaa' }}>
+                          {line}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               )}
               {paymentStatus === 'success' && (
                 <p className="difficulty-desc" style={{ color: '#00c853' }}>✅ Thank you! Your tip was received. 🎉</p>
