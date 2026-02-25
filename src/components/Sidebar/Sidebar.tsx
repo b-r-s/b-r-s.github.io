@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import React from 'react';
 import './Sidebar.css';
 import { GameButton } from '../GameButton/GameButton';
 import type { AILevel, Player, PlayerColorTheme, BoardColorTheme } from '../../types/game';
@@ -8,23 +9,50 @@ import { COLOR_THEME_LABELS, BOARD_THEME_LABELS, BOARD_COLOR_SCHEMES } from '../
 
 import { NeonColors } from '../../types/neon-hues';
 
-const DebugPanel = ({ lines }: { lines: string[] }) => (
-  <div style={{
-    marginTop: '8px', background: '#111', border: '1px solid #333',
-    borderRadius: '6px', padding: '8px', maxHeight: '200px',
-    overflowY: 'auto', fontFamily: 'monospace', fontSize: '10px',
-    lineHeight: '1.6', textAlign: 'left',
-  }}>
-    {lines.map((line, i) => (
-      <div key={i} style={{
-        color: /FAIL|ERROR|THREW/.test(line) ? '#ff5252'
-             : /OK|resolved/.test(line) ? '#00c853'
-             : '#ccc',
-        wordBreak: 'break-all',
-      }}>{line}</div>
-    ))}
-  </div>
-);
+const DebugPanel = ({ lines }: { lines: string[] }) => {
+  const [localLines, setLocalLines] = React.useState<string[]>(lines);
+
+  // Read directly from localStorage on mount + every 2s
+  // React state may be stale if Pi Browser froze JS before commits
+  React.useEffect(() => {
+    const read = () => {
+      try {
+        const saved = localStorage.getItem('pi_debug_log');
+        if (saved) {
+          const parsed: string[] = JSON.parse(saved);
+          if (parsed.length > 0) setLocalLines(parsed);
+        }
+      } catch (_) {}
+    };
+    read();
+    const id = setInterval(read, 1500);
+    return () => clearInterval(id);
+  }, []);
+
+  React.useEffect(() => {
+    if (lines.length > localLines.length) setLocalLines(lines);
+  }, [lines]);
+
+  const display = localLines.length > 0 ? localLines : ['Waiting for Pi callbacks...'];
+
+  return (
+    <div style={{
+      marginTop: '8px', background: '#111', border: '1px solid #333',
+      borderRadius: '6px', padding: '8px', maxHeight: '200px',
+      overflowY: 'auto', fontFamily: 'monospace', fontSize: '10px',
+      lineHeight: '1.6', textAlign: 'left',
+    }}>
+      {display.map((line, i) => (
+        <div key={i} style={{
+          color: /FAIL|ERROR|THREW/.test(line) ? '#ff5252'
+               : /OK|resolved/.test(line) ? '#00c853'
+               : '#ccc',
+          wordBreak: 'break-all',
+        }}>{line}</div>
+      ))}
+    </div>
+  );
+};
 
 export interface SidebarProps {
   aiLevel: AILevel;
@@ -395,7 +423,7 @@ export function Sidebar({
               {paymentStatus === 'pending' && (
                 <div>
                   <p className="difficulty-desc" style={{ color: '#f0b90b' }}>⏳ Processing payment in Pi Browser…</p>
-                  {debugLog.length > 0 && <DebugPanel lines={debugLog} />}
+                  <DebugPanel lines={debugLog} />
                 </div>
               )}
               {paymentStatus === 'success' && (
