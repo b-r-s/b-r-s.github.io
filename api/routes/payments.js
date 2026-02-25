@@ -11,6 +11,11 @@ const router = express.Router();
 router.post('/approve', async (req, res) => {
   const { paymentId } = req.body;
 
+  // Warmup ping — just wake the function, no real work needed
+  if (paymentId === '__warmup__') {
+    return res.json({ ok: true, warmup: true });
+  }
+
   if (!paymentId) {
     return res.status(400).json({ 
       error: 'Missing paymentId',

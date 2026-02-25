@@ -86,8 +86,13 @@ export const usePiNetwork = () => {
 
     // Pre-warm the serverless function so the cold-start delay doesn't consume
     // the 60-second approval window that Pi gives us.
+    // Ping the approve route specifically (not just health) to warm the exact code path.
     try {
-      await fetch(`${apiBase}/api/health`);
+      await fetch(`${apiBase}/api/payments/approve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId: '__warmup__' }),
+      });
       addLog('Server warm');
     } catch (_) {
       addLog('Server pre-warm failed — continuing anyway');
