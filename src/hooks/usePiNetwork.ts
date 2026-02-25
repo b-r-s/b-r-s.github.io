@@ -1,11 +1,13 @@
-﻿import { useState, useMemo, useEffect } from 'react';
-import { PiNetworkClient } from '@xhilo/pi-sdk';
+﻿import { useState, useEffect } from 'react';
+// Fully bypasses @xhilo/pi-sdk — calls window.Pi directly.
+// The wrapper was silently swallowing callbacks in Pi Browser.
 
-// Type definitions for Pi Network SDK alignment
 interface PiUser {
   username: string;
   uid: string;
 }
+
+const getPi = () => (window as any).Pi ?? null;
 
 export const usePiNetwork = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -14,108 +16,76 @@ export const usePiNetwork = () => {
   const [debugLog, setDebugLog] = useState<string[]>([]);
 
   const addLog = (msg: string) => {
-    const ts = new Date().toISOString().slice(11, 23); // HH:MM:SS.mmm
-    console.log(`[Pi Debug ${ts}] ${msg}`);
+    const ts = new Date().toISOString().slice(11, 23);
+    console.log(`[Pi ${ts}] ${msg}`);
     setDebugLog(prev => [...prev.slice(-20), `${ts} ${msg}`]);
   };
 
-  // Initialize Pi SDK instance
-  const pi = useMemo(() => {
+  // Init Pi SDK on mount
+  useEffect(() => {
+    const Pi = getPi();
+    if (!Pi) return;
     try {
-      // MANDATORY: Manually trigger the global Pi init for the Sandbox/Portal handshake
-      if (typeof window !== 'undefined' && (window as any).Pi) {
-        // We initialize version 2.0. We don't force sandbox: true here
-        // to allow native Pi Browser auth to work without origin mismatches.
-        (window as any).Pi.init({ version: "2.0" });
-        console.log("Pi SDK Global Init: Success");
-      }
-
-      // Return the client wrapper
-      return new PiNetworkClient(true);
-    } catch (error) {
-      console.error("Pi SDK Init Error:", error);
-      return null;
+      Pi.init({ version: '2.0' });
+      console.log('[Pi] SDK init OK');
+    } catch (e) {
+      console.warn('[Pi] SDK init error:', e);
     }
   }, []);
 
-  // Initialize and check authentication on mount
-  useEffect(() => {
-    if (!pi) return;
-
-    pi.initialize().then((result: any) => {
-      // Check if result exists and is successful
-      if (result && result.success) {
-        const currentUser = pi.getUser();
-        if (currentUser) {
-          setIsAuthenticated(true);
-          setUser({
-            uid: currentUser.uid,
-            username: currentUser.username || ''
-          });
-        }
-      }
-    }).catch((err: any) => {
-      console.warn('Pi Initialization silent catch:', err);
-    });
-  }, [pi]);
-
   const authenticate = async () => {
-    if (!pi) return;
+    const Pi = getPi();
+    if (!Pi) throw new Error('window.Pi not available');
 
-    try {
-      // Simplified authentication: Only ask for 'username'
-      // We keep the empty callback () => {} because the SDK requires it
-      const result = await pi.authenticate(['username', 'payments'], (_payment: any) => {
-        console.log('Sandbox safety check: No payment logic active.');
-      });
-
-      if (result && result.success && result.data) {
-        setIsAuthenticated(true);
-        setUser({
-          uid: result.data.uid,
-          username: result.data.username || ''
-        });
+    // onIncompletePaymentFound is required by the SDK signature
+    const result = await Pi.authenticate(
+      ['username', 'payments'],
+      (_incompletePayment: any) => {
+        console.log('[Pi] Incomplete payment during auth — ignoring');
       }
-    } catch (error) {
-      console.error('Authentication error:', error);
-      throw error; // Re-throw so callers (App.tsx) can handle it
+    );
+
+    if (result?.user) {
+      setIsAuthenticated(true);
+      setUser({ uid: result.user.uid, username: result.user.username || '' });
+    } else if (result?.accessToken) {
+      // Some SDK versions return accessToken at root level
+      setIsAuthenticated(true);
     }
+    return result;
   };
 
   const createPayment = async (amount: number, memo: string) => {
-    // Bypass the @xhilo/pi-sdk wrapper and call window.Pi directly.
-    // The wrapper has been unreliable for relaying payment callbacks in Pi Browser.
-    const PiGlobal = (window as any).Pi;
-    if (!PiGlobal) {
-      console.error('window.Pi not available');
+    const Pi = getPi();
+    setPaymentStatus('pending');
+    setDebugLog([]);
+    addLog(`createPayment: ${amount}π`);
+    addLog(`isAuthenticated: ${isAuthenticated}`);
+    addLog(`window.Pi: ${!!Pi}`);
+
+    if (!Pi) {
+      addLog('ERROR: window.Pi not available');
       setPaymentStatus('error');
       return;
     }
-    setPaymentStatus('pending');
-    setDebugLog([]);
-    addLog(`createPayment called: ${amount}π "${memo}"`);
-    addLog(`isAuthenticated: ${isAuthenticated}`);
-    addLog(`window.Pi available: ${!!PiGlobal}`);
-    const apiBase = import.meta.env.VITE_API_BASE_URL ?? '';
-    addLog(`apiBase: "${apiBase || '(same-domain)'}"`);
 
-    // Pi requires an authenticated session with 'payments' scope before createPayment.
-    // If the 8s startup timeout fired before auth completed, re-authenticate now.
     if (!isAuthenticated) {
-      addLog('Not authenticated — re-authenticating with payments scope...');
+      addLog('Not authenticated — calling Pi.authenticate now...');
       try {
         await authenticate();
-        addLog('Re-auth success');
+        addLog('Auth OK');
       } catch (e) {
-        addLog(`Re-auth failed: ${e}`);
+        addLog(`Auth FAILED: ${e}`);
         setPaymentStatus('error');
         return;
       }
     }
 
+    const apiBase = import.meta.env.VITE_API_BASE_URL ?? '';
+    addLog('Calling Pi.createPayment...');
+
     try {
-      addLog('Calling PiGlobal.createPayment...');
-      await PiGlobal.createPayment(
+      await Pi.createPayment(
         { amount, memo, metadata: { source: 'tip_developer' } },
         {
           onReadyForServerApproval: (paymentId: string) => {
@@ -175,7 +145,6 @@ export const usePiNetwork = () => {
   };
 
   return {
-    pi,
     isAuthenticated,
     user,
     authenticate,
