@@ -84,6 +84,15 @@ export const usePiNetwork = () => {
     const apiBase = import.meta.env.VITE_API_BASE_URL ?? '';
     addLog('Calling Pi.createPayment...');
 
+    // Pre-warm the serverless function so the cold-start delay doesn't consume
+    // the 60-second approval window that Pi gives us.
+    try {
+      await fetch(`${apiBase}/api/health`);
+      addLog('Server warm');
+    } catch (_) {
+      addLog('Server pre-warm failed — continuing anyway');
+    }
+
     try {
       await Pi.createPayment(
         { amount, memo, metadata: { source: 'tip_developer' } },

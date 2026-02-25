@@ -80,6 +80,14 @@ export function Sidebar({
   const [activeTab, setActiveTab] = useState<'game' | 'settings' | 'colors' | 'board' | 'support'>('game');
   const [currentMoveTime, setCurrentMoveTime] = useState(0);
 
+  // Pre-warm the Vercel serverless function as soon as the Support tab is opened
+  // so the cold-start delay doesn't eat into the 60-second payment approval window.
+  useEffect(() => {
+    if (activeTab === 'support') {
+      fetch('/api/health').catch(() => {});
+    }
+  }, [activeTab]);
+
   // Get winner from scores if available (winner is set when total is not 0 and the other is 0 or game is over)
   // actually, we need to know if the game is over. We'll infer from totalTime: if both timers are not running and showPlayAgain is true, stop timer.
   const gameOver = showPlayAgain;
