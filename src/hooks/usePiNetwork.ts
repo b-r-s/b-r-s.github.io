@@ -92,18 +92,44 @@ export const usePiNetwork = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Init Pi SDK on mount
+  // Init Pi SDK and authenticate on mount
   useEffect(() => {
     const Pi = getPi();
     if (!Pi) return;
     try {
-      // sandbox: true is required for TestNet/Sandbox testing
-      // Without it Pi treats this as a mainnet app, causing payment flow mismatches
       Pi.init({ version: '2.0', sandbox: true });
       console.log('[Pi] SDK init OK (sandbox mode)');
     } catch (e) {
       console.warn('[Pi] SDK init error:', e);
+      return;
     }
+    // Authenticate immediately on load so isAuthenticated is true before user taps payment
+    Pi.authenticate(
+      ['username', 'payments'],
+      (incompletePayment: any) => {
+        const paymentId = incompletePayment?.identifier;
+        if (paymentId) {
+          const apiBase = import.meta.env.VITE_API_BASE_URL ?? '';
+          console.log('[Pi] Incomplete payment on auth, approving:', paymentId);
+          fetch(`${apiBase}/api/payments/approve`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ paymentId }),
+          }).catch(() => {});
+        }
+      }
+    ).then((result: any) => {
+      if (result?.user) {
+        setIsAuthenticated(true);
+        setUser({ uid: result.user.uid, username: result.user.username || '' });
+        console.log('[Pi] Auth on mount OK:', result.user.username);
+      } else if (result?.accessToken) {
+        setIsAuthenticated(true);
+        console.log('[Pi] Auth on mount OK (accessToken)');
+      }
+    }).catch((e: any) => {
+      console.warn('[Pi] Auth on mount failed:', e);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const authenticate = async () => {
