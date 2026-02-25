@@ -94,6 +94,7 @@ export const usePiNetwork = () => {
     setPaymentStatus('pending');
     setDebugLog([]);
     addLog(`createPayment called: ${amount}π "${memo}"`);
+    addLog(`isAuthenticated: ${isAuthenticated}`);
     addLog(`window.Pi available: ${!!PiGlobal}`);
     const apiBase = import.meta.env.VITE_API_BASE_URL ?? '';
     addLog(`apiBase: "${apiBase || '(same-domain)'}"`);

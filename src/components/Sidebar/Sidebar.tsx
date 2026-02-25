@@ -8,6 +8,24 @@ import { COLOR_THEME_LABELS, BOARD_THEME_LABELS, BOARD_COLOR_SCHEMES } from '../
 
 import { NeonColors } from '../../types/neon-hues';
 
+const DebugPanel = ({ lines }: { lines: string[] }) => (
+  <div style={{
+    marginTop: '8px', background: '#111', border: '1px solid #333',
+    borderRadius: '6px', padding: '8px', maxHeight: '200px',
+    overflowY: 'auto', fontFamily: 'monospace', fontSize: '10px',
+    lineHeight: '1.6', textAlign: 'left',
+  }}>
+    {lines.map((line, i) => (
+      <div key={i} style={{
+        color: /FAIL|ERROR|THREW/.test(line) ? '#ff5252'
+             : /OK|resolved/.test(line) ? '#00c853'
+             : '#ccc',
+        wordBreak: 'break-all',
+      }}>{line}</div>
+    ))}
+  </div>
+);
+
 export interface SidebarProps {
   aiLevel: AILevel;
   onAILevelChange: (level: AILevel) => void;
@@ -369,28 +387,7 @@ export function Sidebar({
               {paymentStatus === 'pending' && (
                 <div>
                   <p className="difficulty-desc" style={{ color: '#f0b90b' }}>⏳ Processing payment in Pi Browser…</p>
-                  {debugLog.length > 0 && (
-                    <div style={{
-                      marginTop: '8px',
-                      background: '#111',
-                      border: '1px solid #333',
-                      borderRadius: '6px',
-                      padding: '8px',
-                      maxHeight: '180px',
-                      overflowY: 'auto',
-                      fontFamily: 'monospace',
-                      fontSize: '10px',
-                      lineHeight: '1.5',
-                      color: '#aaa',
-                      textAlign: 'left',
-                    }}>
-                      {debugLog.map((line, i) => (
-                        <div key={i} style={{ color: line.includes('FAIL') || line.includes('ERROR') || line.includes('THREW') ? '#ff5252' : line.includes('OK') ? '#00c853' : '#aaa' }}>
-                          {line}
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  {debugLog.length > 0 && <DebugPanel lines={debugLog} />}
                 </div>
               )}
               {paymentStatus === 'success' && (
@@ -405,6 +402,7 @@ export function Sidebar({
               {paymentStatus === 'error' && (
                 <>
                   <p className="difficulty-desc" style={{ color: '#ff5252' }}>❌ Something went wrong. Please try again.</p>
+                  {debugLog.length > 0 && <DebugPanel lines={debugLog} />}
                   <button className="difficulty-btn" onClick={resetPaymentStatus}>Try Again</button>
                 </>
               )}
