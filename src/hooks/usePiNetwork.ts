@@ -179,7 +179,7 @@ export const usePiNetwork = () => {
     }
 
     try {
-      await Pi.createPayment(
+      Pi.createPayment(
         { amount, memo, metadata: { source: 'tip_developer' } },
         {
           onReadyForServerApproval: (paymentId: string) => {
@@ -218,7 +218,6 @@ export const usePiNetwork = () => {
           },
         }
       );
-      addLog('createPayment promise resolved');
     } catch (error) {
       addLog(`createPayment THREW: ${error}`);
       setPaymentStatus('error');
