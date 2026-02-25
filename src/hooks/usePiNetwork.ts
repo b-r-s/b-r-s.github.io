@@ -65,7 +65,7 @@ export const usePiNetwork = () => {
     try {
       // Simplified authentication: Only ask for 'username'
       // We keep the empty callback () => {} because the SDK requires it
-      const result = await pi.authenticate(['username'], (_payment: any) => {
+      const result = await pi.authenticate(['username', 'payments'], (_payment: any) => {
         console.log('Sandbox safety check: No payment logic active.');
       });
 
@@ -98,6 +98,21 @@ export const usePiNetwork = () => {
     addLog(`window.Pi available: ${!!PiGlobal}`);
     const apiBase = import.meta.env.VITE_API_BASE_URL ?? '';
     addLog(`apiBase: "${apiBase || '(same-domain)'}"`);
+
+    // Pi requires an authenticated session with 'payments' scope before createPayment.
+    // If the 8s startup timeout fired before auth completed, re-authenticate now.
+    if (!isAuthenticated) {
+      addLog('Not authenticated — re-authenticating with payments scope...');
+      try {
+        await authenticate();
+        addLog('Re-auth success');
+      } catch (e) {
+        addLog(`Re-auth failed: ${e}`);
+        setPaymentStatus('error');
+        return;
+      }
+    }
+
     try {
       addLog('Calling PiGlobal.createPayment...');
       await PiGlobal.createPayment(
