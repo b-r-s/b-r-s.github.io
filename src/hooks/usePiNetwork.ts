@@ -34,6 +34,52 @@ export const usePiNetwork = () => {
     } catch (_) {}
   }, []);
 
+  const approvePayment = (paymentId: string, apiBase: string) => {
+    // Store in localStorage immediately — survives page reload if beacon fails
+    try { localStorage.setItem('pi_pending_approval', JSON.stringify({ paymentId, apiBase, ts: Date.now() })); } catch (_) {}
+
+    const url = `${apiBase}/api/payments/approve`;
+    const body = JSON.stringify({ paymentId });
+
+    // sendBeacon fires even when the page is frozen/navigating away
+    const sent = navigator.sendBeacon(url, new Blob([body], { type: 'application/json' }));
+    addLog(`sendBeacon approve: ${sent ? 'queued' : 'failed — trying fetch'}`);
+
+    if (!sent) {
+      // Fallback: keepalive fetch
+      fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: true })
+        .then(async r => { const d = await r.json(); addLog(`APPROVE ${r.ok ? 'OK' : 'FAILED ' + r.status}: ${JSON.stringify(d).slice(0,60)}`); })
+        .catch(err => addLog(`APPROVE FETCH ERROR: ${err}`));
+    }
+  };
+
+  // On mount: check for a pending approval that survived a page reload
+  useEffect(() => {
+    const apiBase = import.meta.env.VITE_API_BASE_URL ?? '';
+    try {
+      const raw = localStorage.getItem('pi_pending_approval');
+      if (raw) {
+        const { paymentId, ts } = JSON.parse(raw);
+        const age = Date.now() - ts;
+        if (age < 55000) { // still within Pi's 60s window
+          addLog(`Retrying pending approval from ${Math.round(age/1000)}s ago: ${paymentId.slice(0,10)}...`);
+          localStorage.removeItem('pi_pending_approval');
+          fetch(`${apiBase}/api/payments/approve`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ paymentId }),
+          }).then(async r => {
+            const d = await r.json();
+            addLog(`RETRY APPROVE ${r.ok ? 'OK' : 'FAILED ' + r.status}: ${JSON.stringify(d).slice(0,60)}`);
+          }).catch(err => addLog(`RETRY APPROVE ERROR: ${err}`));
+        } else {
+          addLog(`Pending approval expired (${Math.round(age/1000)}s old) — clearing`);
+          localStorage.removeItem('pi_pending_approval');
+        }
+      }
+    } catch (_) {}
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Init Pi SDK on mount
   useEffect(() => {
     const Pi = getPi();
@@ -50,11 +96,18 @@ export const usePiNetwork = () => {
     const Pi = getPi();
     if (!Pi) throw new Error('window.Pi not available');
 
-    // onIncompletePaymentFound is required by the SDK signature
+    // onIncompletePaymentFound is Pi's built-in retry mechanism:
+    // if a previous payment was created but not approved, Pi calls this on auth.
     const result = await Pi.authenticate(
       ['username', 'payments'],
-      (_incompletePayment: any) => {
-        console.log('[Pi] Incomplete payment during auth — ignoring');
+      (incompletePayment: any) => {
+        const paymentId = incompletePayment?.identifier;
+        console.log('[Pi] Incomplete payment found:', paymentId);
+        if (paymentId) {
+          const apiBase = import.meta.env.VITE_API_BASE_URL ?? '';
+          addLog(`Incomplete payment found: ${paymentId.slice(0,10)}... approving now`);
+          approvePayment(paymentId, apiBase);
+        }
       }
     );
 
@@ -117,23 +170,7 @@ export const usePiNetwork = () => {
         {
           onReadyForServerApproval: (paymentId: string) => {
             addLog(`onReadyForServerApproval: ${paymentId.slice(0,10)}...`);
-            const t0 = Date.now();
-            fetch(`${apiBase}/api/payments/approve`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ paymentId }),
-              keepalive: true,   // survives Pi Browser navigating away
-            })
-              .then(async r => {
-                const ms = Date.now() - t0;
-                const data = await r.json();
-                if (!r.ok) {
-                  addLog(`APPROVE FAILED ${r.status} (${ms}ms): ${JSON.stringify(data).slice(0,60)}`);
-                } else {
-                  addLog(`APPROVE OK (${ms}ms)`);
-                }
-              })
-              .catch(err => addLog(`APPROVE FETCH ERROR (${Date.now()-t0}ms): ${err}`));
+            approvePayment(paymentId, apiBase);
           },
           onReadyForServerCompletion: (paymentId: string, txid: string) => {
             addLog(`onReadyForServerCompletion txid: ${txid}`);
