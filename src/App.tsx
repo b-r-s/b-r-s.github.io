@@ -125,13 +125,18 @@ function App() {
   // 2. Handle specific preview or error states
   let currentError = previewAuth === 'failed' ? 'Authentication failed.' : null;
   let authErrorDetail = '';
-  if (!currentError && typeof window !== 'undefined') {
+  let piSdkStatus = '';
+  let debugLogLines: string[] = [];
+  if (typeof window !== 'undefined') {
+    piSdkStatus = (window.Pi ? 'window.Pi detected' : 'window.Pi NOT detected');
     try {
       const stored = localStorage.getItem('pi_auth_error');
       if (stored) {
         currentError = 'Authentication failed.';
         authErrorDetail = stored;
       }
+      const log = localStorage.getItem('pi_debug_log');
+      if (log) debugLogLines = JSON.parse(log);
     } catch (_) {}
   }
   const isCheckingPreview = previewAuth === 'checking';
@@ -149,13 +154,17 @@ function App() {
               <div className="error-badge">{currentError}</div>
               <h1>Initialization Failed</h1>
               <p className="error-detail">
-                {authErrorDetail ? (
-                  <>
-                    <b>Error:</b> {authErrorDetail}<br />
-                  </>
-                ) : null}
+                <b>SDK Status:</b> {piSdkStatus}<br />
+                {authErrorDetail ? (<><b>Error:</b> {authErrorDetail}<br /></>) : null}
                 This app requires the Pi Network SDK.<br />
-                Please open in the Pi Browser or use the Pi Developer Portal sandbox for full functionality.
+                Please open in the Pi Browser or use the Pi Developer Portal sandbox for full functionality.<br />
+                <br />
+                <details style={{textAlign:'left',marginTop:'1em'}}>
+                  <summary style={{cursor:'pointer'}}>Show Debug Log</summary>
+                  <pre style={{fontSize:'0.85em',background:'#222',color:'#fff',padding:'0.5em',borderRadius:'6px',maxHeight:'200px',overflow:'auto'}}>
+                    {debugLogLines.length ? debugLogLines.join('\n') : 'No debug log.'}
+                  </pre>
+                </details>
               </p>
               <button className="welcome-button" onClick={() => window.location.reload()}>
                 Retry Connection
