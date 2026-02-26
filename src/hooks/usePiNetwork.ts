@@ -206,7 +206,7 @@ export const usePiNetwork = () => {
           return;
         }
       } catch (e) {
-        let errMsg = (e && e.message) ? e.message : String(e);
+        let errMsg = (typeof e === 'object' && e && 'message' in e) ? (e as any).message : String(e);
         addLog(`Auth FAILED: ${errMsg}`);
         setPaymentStatus('error');
         // Store error for UI display if needed
