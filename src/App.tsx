@@ -58,9 +58,9 @@ function App() {
     if (typeof window !== 'undefined' && 'Pi' in window) {
       const authTimeout = new Promise<void>(resolve =>
         setTimeout(() => {
-          console.warn('Pi auth timed out — proceeding to game.');
+          console.warn('Pi auth timed out after 20s — proceeding to game.');
           resolve();
-        }, 8000)
+        }, 20000)
       );
       Promise.race([authenticate(), authTimeout])
         .finally(() => setAuthChecked(true));
@@ -123,7 +123,17 @@ function App() {
   }
 
   // 2. Handle specific preview or error states
-  const currentError = previewAuth === 'failed' ? 'Authentication failed.' : null;
+  let currentError = previewAuth === 'failed' ? 'Authentication failed.' : null;
+  let authErrorDetail = '';
+  if (!currentError && typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem('pi_auth_error');
+      if (stored) {
+        currentError = 'Authentication failed.';
+        authErrorDetail = stored;
+      }
+    } catch (_) {}
+  }
   const isCheckingPreview = previewAuth === 'checking';
 
   if (currentError || isCheckingPreview) {
@@ -139,6 +149,11 @@ function App() {
               <div className="error-badge">{currentError}</div>
               <h1>Initialization Failed</h1>
               <p className="error-detail">
+                {authErrorDetail ? (
+                  <>
+                    <b>Error:</b> {authErrorDetail}<br />
+                  </>
+                ) : null}
                 This app requires the Pi Network SDK.<br />
                 Please open in the Pi Browser or use the Pi Developer Portal sandbox for full functionality.
               </p>

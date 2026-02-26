@@ -189,9 +189,9 @@ export const usePiNetwork = () => {
       addLog('Waiting for auth...');
       try {
         // Reuse the in-flight auth promise from mount — never call Pi.authenticate twice
-        // Race against 8s timeout so we never hang forever
+        // Race against 20s timeout so we never hang forever
         const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('auth timeout')), 8000)
+          setTimeout(() => reject(new Error('auth timeout (20s)')), 20000)
         );
         const result = await Promise.race([
           authPromiseRef.current ?? Promise.resolve(null),
@@ -206,8 +206,11 @@ export const usePiNetwork = () => {
           return;
         }
       } catch (e) {
-        addLog(`Auth FAILED: ${e}`);
+        let errMsg = (e && e.message) ? e.message : String(e);
+        addLog(`Auth FAILED: ${errMsg}`);
         setPaymentStatus('error');
+        // Store error for UI display if needed
+        try { localStorage.setItem('pi_auth_error', errMsg); } catch (_) {}
         return;
       }
     }
