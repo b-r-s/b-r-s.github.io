@@ -110,6 +110,7 @@ export const usePiNetwork = () => {
     }
     // Authenticate immediately on load — store promise in ref so createPayment can await it
     const apiBase = import.meta.env.VITE_API_BASE_URL ?? '';
+    console.log('[Pi] Starting auth on mount...');
     authPromiseRef.current = Pi.authenticate(
       ['username', 'payments'],
       (incompletePayment: any) => {
@@ -188,15 +189,22 @@ export const usePiNetwork = () => {
       addLog('Waiting for auth...');
       try {
         // Reuse the in-flight auth promise from mount — never call Pi.authenticate twice
-        if (authPromiseRef.current) {
-          await authPromiseRef.current;
-        }
-        if (!isAuthenticated) {
-          addLog('Auth not complete — aborting');
+        // Race against 8s timeout so we never hang forever
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('auth timeout')), 8000)
+        );
+        const result = await Promise.race([
+          authPromiseRef.current ?? Promise.resolve(null),
+          timeoutPromise,
+        ]);
+        if (result?.user || result?.accessToken) {
+          addLog('Auth OK');
+          // isAuthenticated state may not have updated yet — continue anyway since result is valid
+        } else {
+          addLog('Auth returned no user — aborting');
           setPaymentStatus('error');
           return;
         }
-        addLog('Auth OK');
       } catch (e) {
         addLog(`Auth FAILED: ${e}`);
         setPaymentStatus('error');
