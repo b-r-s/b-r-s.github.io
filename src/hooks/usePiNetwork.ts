@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 // Fully bypasses @xhilo/pi-sdk — calls window.Pi directly.
 // The wrapper was silently swallowing callbacks in Pi Browser.
 
@@ -12,6 +12,8 @@ const getPi = () => (window as any).Pi ?? null;
 export const usePiNetwork = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<PiUser | null>(null);
+  // Track in-flight auth promise so we never call Pi.authenticate twice simultaneously
+  const authPromiseRef = useRef<Promise<any> | null>(null);
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'pending' | 'success' | 'cancelled' | 'error'>('idle');
   const [debugLog, setDebugLog] = useState<string[]>([]);
 
@@ -103,13 +105,13 @@ export const usePiNetwork = () => {
       console.warn('[Pi] SDK init error:', e);
       return;
     }
-    // Authenticate immediately on load so isAuthenticated is true before user taps payment
-    Pi.authenticate(
+    // Authenticate immediately on load — store promise in ref so createPayment can await it
+    const apiBase = import.meta.env.VITE_API_BASE_URL ?? '';
+    authPromiseRef.current = Pi.authenticate(
       ['username', 'payments'],
       (incompletePayment: any) => {
         const paymentId = incompletePayment?.identifier;
         if (paymentId) {
-          const apiBase = import.meta.env.VITE_API_BASE_URL ?? '';
           console.log('[Pi] Incomplete payment on auth, approving:', paymentId);
           fetch(`${apiBase}/api/payments/approve`, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -126,8 +128,10 @@ export const usePiNetwork = () => {
         setIsAuthenticated(true);
         console.log('[Pi] Auth on mount OK (accessToken)');
       }
+      return result;
     }).catch((e: any) => {
       console.warn('[Pi] Auth on mount failed:', e);
+      authPromiseRef.current = null;
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -176,9 +180,17 @@ export const usePiNetwork = () => {
     }
 
     if (!isAuthenticated) {
-      addLog('Not authenticated — calling Pi.authenticate now...');
+      addLog('Waiting for auth...');
       try {
-        await authenticate();
+        // Reuse the in-flight auth promise from mount — never call Pi.authenticate twice
+        if (authPromiseRef.current) {
+          await authPromiseRef.current;
+        }
+        if (!isAuthenticated) {
+          addLog('Auth not complete — aborting');
+          setPaymentStatus('error');
+          return;
+        }
         addLog('Auth OK');
       } catch (e) {
         addLog(`Auth FAILED: ${e}`);
