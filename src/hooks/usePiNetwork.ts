@@ -27,21 +27,24 @@ export const usePiNetwork = () => {
       const existing: string[] = JSON.parse(localStorage.getItem('pi_debug_log') || '[]');
       const next = [...existing.slice(-20), line];
       localStorage.setItem('pi_debug_log', JSON.stringify(next));
+      localStorage.setItem('pi_debug_log_ts', String(Date.now()));
     } catch (_) {}
     setDebugLog(prev => [...prev.slice(-20), line]);
   };
 
-  // Restore log + status from localStorage on mount (survives Pi Browser navigation away/back)
+  // Restore log from localStorage on mount
   useEffect(() => {
     try {
       const saved = localStorage.getItem('pi_debug_log');
       if (saved) {
         const lines: string[] = JSON.parse(saved);
         setDebugLog(lines);
-        // If the last log line shows we were mid-payment, restore pending state
-        // so the debug panel is visible when the app reloads
+        // Only restore pending state if the log is very recent (< 30s old)
+        // to avoid showing stale payment state after app reload
+        const savedTs = localStorage.getItem('pi_debug_log_ts');
+        const age = savedTs ? Date.now() - parseInt(savedTs) : 99999999;
         const last = lines[lines.length - 1] ?? '';
-        if (last.includes('sendBeacon') || last.includes('onReadyForServer') || last.includes('Calling Pi')) {
+        if (age < 30000 && (last.includes('sendBeacon') || last.includes('onReadyForServer'))) {
           setPaymentStatus('pending');
         }
       }
@@ -167,6 +170,8 @@ export const usePiNetwork = () => {
 
   const createPayment = async (amount: number, memo: string) => {
     const Pi = getPi();
+    // Clear old localStorage log immediately so DebugPanel shows fresh data
+    try { localStorage.removeItem('pi_debug_log'); } catch (_) {}
     setPaymentStatus('pending');
     setDebugLog([]);
     addLog(`createPayment: ${amount}π`);
