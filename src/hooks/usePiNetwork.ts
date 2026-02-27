@@ -7,7 +7,21 @@ interface PiUser {
   uid: string;
 }
 
-const getPi = () => (window as any).Pi ?? null;
+// Returns window.Pi unless in dev mode (localhost or VITE_DEV_NO_PI)
+const isDevMode = () => {
+  // Vite sets import.meta.env.DEV to true in dev mode
+  if (import.meta.env.DEV) return true;
+  // Allow override via env var
+  if (import.meta.env.VITE_DEV_NO_PI === 'true') return true;
+  // Fallback: check if running on localhost
+  if (typeof window !== 'undefined' && window.location && window.location.hostname === 'localhost') return true;
+  return false;
+};
+
+const getPi = () => {
+  if (isDevMode()) return null;
+  return (window as any).Pi ?? null;
+};
 
 export const usePiNetwork = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -99,10 +113,16 @@ export const usePiNetwork = () => {
 
   // Init Pi SDK and authenticate on mount
   useEffect(() => {
+    if (isDevMode()) {
+      setIsAuthenticated(true);
+      setUser({ uid: 'devuser', username: 'devuser' });
+      console.log('[Pi] Dev mode: skipping Pi SDK init/auth');
+      return;
+    }
     const Pi = getPi();
     if (!Pi) return;
     try {
-      Pi.init({ version: '2.0', sandbox: true });
+      Pi.init({ version: '2.0', sandbox: false });
       console.log('[Pi] SDK init OK (sandbox mode)');
     } catch (e) {
       console.warn('[Pi] SDK init error:', e);
@@ -141,6 +161,11 @@ export const usePiNetwork = () => {
   }, []);
 
   const authenticate = async () => {
+    if (isDevMode()) {
+      setIsAuthenticated(true);
+      setUser({ uid: 'devuser', username: 'devuser' });
+      return { user: { uid: 'devuser', username: 'devuser' } };
+    }
     const Pi = getPi();
     if (!Pi) throw new Error('window.Pi not available');
 
@@ -170,6 +195,17 @@ export const usePiNetwork = () => {
   };
 
   const createPayment = async (amount: number, memo: string) => {
+    if (isDevMode()) {
+      // Simulate payment flow in dev mode
+      setPaymentStatus('pending');
+      setDebugLog([]);
+      addLog(`DEV MODE: createPayment: ${amount}π`);
+      setTimeout(() => {
+        addLog('DEV MODE: Payment success');
+        setPaymentStatus('success');
+      }, 1000);
+      return;
+    }
     const Pi = getPi();
     // Clear old localStorage log immediately so DebugPanel shows fresh data
     try { localStorage.removeItem('pi_debug_log'); } catch (_) {}

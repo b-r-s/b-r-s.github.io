@@ -1,16 +1,18 @@
+
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { qrcode } from 'vite-plugin-qrcode';
 
 // https://vite.dev/config/
 export default defineConfig({
   base: '/',
   plugins: [
-     
-    react()
+    react(),
+    qrcode(),
   ],
   server: {
     host: true, // Allow access from network
-    port: 5174,
+    port: 5100,
     strictPort: true,
   },
   define: {
