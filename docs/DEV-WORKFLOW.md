@@ -37,7 +37,10 @@ If you are already authorized, you won't see the consent popup. To force it to a
 ## 4. Troubleshooting
 * **Refresh Issue:** If the desktop app loses connection, re-run the "Authorize Sandbox" step on the phone.
 * **White Screen:** Ensure your Desktop Firewall isn't blocking the local port (3000, 8080, etc.).
-* **SDK Error:** Double-check that `sandbox: true` is set in your `Pi.init` code.
+* **SDK Error:** Check the `sandbox` flag in your `Pi.init` call:
+  - `sandbox: true` — only when using Pi's Sandbox authorization tool (desktop sandbox testing via Pi Developer Portal)
+  - `sandbox: false` — when app is hosted on a real URL (GitHub Pages, Vercel, etc.) and opened in Pi Browser directly
+  - **Wrong sandbox value is the #1 cause of silent payment failures** — `onReadyForServerApproval` simply won't fire if this is wrong
 
 ---
 *Reference: Pi Network 2026 Developer Guidelines*

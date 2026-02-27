@@ -73,14 +73,57 @@ checkers4pi/
 - Real-time scoring
 - Sound and Visual effects
 
+## Deployment Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  Source Code: github.com/b-r-s/b-r-s.github.io          │
+│  (single repo — all code lives here)                    │
+└────────────────┬────────────────────┬───────────────────┘
+                 │                    │
+          GitHub Actions           Vercel
+          (on every push)       (on every push)
+                 │                    │
+                 ▼                    ▼
+    ┌────────────────────┐  ┌─────────────────────────┐
+    │  GitHub Pages      │  │  Vercel Serverless      │
+    │  b-r-s.github.io   │  │  checkers4-pi.vercel.app│
+    │  (React frontend)  │  │  (Express API backend)  │
+    └────────────────────┘  └─────────────────────────┘
+                 │                    │
+                 └──────┬─────────────┘
+                        │
+                 Pi Browser loads
+                 b-r-s.github.io
+                 API calls go to
+                 checkers4-pi.vercel.app
+```
+
+### Frontend: GitHub Pages
+- Built by GitHub Actions (`npm run build`) on every push to `main`
+- Serves compiled `dist/` folder at `https://b-r-s.github.io`
+- Workflow: `.github/workflows/deploy.yml`
+
+### Backend: Vercel
+- Serverless Express API at `https://checkers4-pi.vercel.app`
+- Handles Pi payment approval and completion server-side
+- Requires `PI_API_KEY` environment variable set in Vercel dashboard
+- Auto-deploys from `b-r-s/b-r-s.github.io` repo on every push
+
+### Pi Developer Portal Configuration
+- **App URL (Production URL):** `https://checkers4-pi.vercel.app` ← must match exactly
+- **API Key:** Set in Vercel env vars as `PI_API_KEY`
+
 ## Technology Stack
 
 - **React 19**: Modern UI framework
 - **TypeScript**: Type-safe code
 - **Vite**: Fast build tool
 - **Vanilla CSS**: Custom styling (Zero-framework architecture)
-- **Pi SDK**: Pi Network integration
+- **Pi SDK**: Pi Network integration (`window.Pi` global, called directly)
 - **Web Audio API**: Sound effects
+- **GitHub Actions**: CI/CD for frontend builds
+- **Vercel**: Serverless backend hosting
 
 ## Development
 
