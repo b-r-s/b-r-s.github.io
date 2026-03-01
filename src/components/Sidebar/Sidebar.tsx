@@ -270,10 +270,10 @@ export function Sidebar({
         {activeTab === 'game' ? (
           <>
             <div className="sidebar-header-with-logo">
-              <div className="sidebar-title-group">
+{/*               <div className="sidebar-title-group">
                 {logo && <img src={logo} alt="Checkers4Pi Logo" className="sidebar-logo" />}
                 <h2 className="sidebar-title">Current Match</h2>
-              </div>
+              </div> */}
               {gameInProgress && (
                 <div className="tooltip-container">
                   <GameButton
