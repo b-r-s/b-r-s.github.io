@@ -120,14 +120,18 @@ export function Sidebar({
   // actually, we need to know if the game is over. We'll infer from totalTime: if both timers are not running and showPlayAgain is true, stop timer.
   const gameOver = showPlayAgain;
 
-  // Update current move timer every 100ms, but stop if game is over
+  // Update current move timer every 100ms, but only after the first move has been made
+  // and stop if game is over. This prevents the timer from running before any move is made.
   useEffect(() => {
-    if (gameOver) return;
+    if (gameOver || !gameInProgress) return;
     const interval = setInterval(() => {
       setCurrentMoveTime(Date.now() - turnStartTime);
     }, 100);
     return () => clearInterval(interval);
-  }, [turnStartTime, gameOver]);
+  }, [turnStartTime, gameOver, gameInProgress]);
+
+  // Derive the displayed move time — 0:00 until the game actually starts
+  const displayedMoveTime = gameInProgress ? currentMoveTime : 0;
 
 
   // Stat labels and tooltips (match GameOverModal)
@@ -163,7 +167,7 @@ export function Sidebar({
     const isActive = currentPlayer === player;
     const score = scores[player];
     const playerTotalTime = totalTime[player];
-    const moveTime = isActive ? currentMoveTime : 0;
+    const moveTime = isActive ? displayedMoveTime : 0;
     const colorClass = player === 'red' ? 'text-red' : 'text-black';
     const isAI = player === 'black' ? true : false;
 

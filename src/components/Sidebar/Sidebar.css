@@ -111,7 +111,7 @@
 
 .sidebar-title {
   margin: 0;
-  font-size: 1rem;
+  font-size: .5rem;
   /* Base size as requested */
   font-weight: 800;
   letter-spacing: -0.5px;
@@ -150,7 +150,7 @@
 
 .player-name {
   font-weight: 700;
-  font-size: 1rem;
+  font-size:  .5rem;
   color: var(--text-primary);
   display: flex;
   align-items: center;
@@ -174,13 +174,13 @@
 }
 
 .sidebar-stat-label {
-  font-size: 1rem;
+  font-size: .5rem;
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .sidebar-stat-value {
-  font-size: 1rem;
+  font-size: .5rem;
   font-weight: bold;
   color: var(--text-primary);
   background: var(--bg-dark);
@@ -193,14 +193,14 @@
 .timer-row {
   display: flex;
   justify-content: space-between;
-  font-size: 1rem;
+  font-size: .5rem;
   color: var(--text-primary);
   font-family: monospace;
 }
 
 button.game-button.tab-button {
   height: 34px !important;
-  font-size: 1rem !important;
+  font-size: .5rem !important;
 }
 
 button.game-button.new-game-btn {
@@ -217,7 +217,7 @@ button.game-button.new-game-btn {
   align-items: center;
   gap: 0.4rem;
   transition: all 0.2s;
-  font-size: 1rem;
+  font-size: .5rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
@@ -230,7 +230,7 @@ button.game-button.new-game-btn {
 }
 
 .difficulty-desc {
-  font-size: 1rem;
+  font-size: .5rem;
   color: var(--text-primary);
   margin-top: 0.5rem;
   text-align: center;
@@ -265,7 +265,7 @@ button.game-button.new-game-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 1rem;
+  font-size: .5rem;
   padding: 0.5rem 0.6rem;
   border-radius: var(--radius-md);
   margin-top: 0.5rem;
@@ -290,7 +290,7 @@ button.game-button.new-game-btn {
 }
 
 .ai-first-toggle .toggle-hint {
-  font-size: 1rem;
+  font-size: .5rem;
   opacity: 0.7;
   font-style: italic;
 }
@@ -306,7 +306,7 @@ button.game-button.new-game-btn {
   margin-right: 2rem;
   margin-left: 1rem;
   border-radius: var(--radius-md);
-  font-size: 0.9rem;
+  font-size: .5rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -324,7 +324,7 @@ button.game-button.new-game-btn {
 .btn-new-game-mini {
   padding: 0.35rem 0.6rem;
   border-radius: var(--radius-sm);
-  font-size: 1rem;
+  font-size: .5rem;
   font-weight: 800;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -358,7 +358,7 @@ button.game-button.new-game-btn {
 
   .tab-button {
     padding: 0.6rem 0.4rem !important;
-    font-size: 0.85rem !important;
+    font-size: 0.5rem !important;
   }
 
   .sidebar-header-with-logo {
@@ -377,14 +377,14 @@ button.game-button.new-game-btn {
   }
 
   .sidebar-title {
-    font-size: 1rem;
+    font-size:  .5rem;
     padding-left: 3vw;
     text-align: center;
     position: relative;
   }
 
   .player-name {
-    font-size: 1rem;
+    font-size: .5rem;
   }
 
   .sidebar-stat-breakdown {
@@ -398,26 +398,26 @@ button.game-button.new-game-btn {
   }
 
   .sidebar-stat-label {
-    font-size: 1rem;
+    font-size: .5rem;
   }
 
   .sidebar-stat-value {
-    font-size: 1.1rem;
+    font-size: .5rem;
     margin-top: 4px;
     padding: 0.1em 0.6em;
   }
 
   .timer-row {
-    font-size: 1rem;
+    font-size: .5rem;
   }
 
   .difficulty-btn {
     padding: 0.6rem;
-    font-size: 1rem;
+    font-size: .5rem;
   }
 
   .difficulty-desc {
-    font-size: 1rem;
+    font-size: .5rem;
   }
 
   .settings-content {
@@ -440,13 +440,13 @@ button.game-button.new-game-btn {
   }
 
   .sidebar-title {
-    font-size: 1.25rem;
+    font-size: .5rem;
     /* Desktop size as requested */
     text-align: left;
   }
 
   .tab-button {
-    font-size: 1rem !important;
+    font-size: .5rem !important;
   }
 }
 
@@ -475,7 +475,7 @@ button.game-button.new-game-btn {
   left: 50%;
   bottom: 125%;
   transform: translateX(-50%);
-  font-size: 1rem;
+  font-size: .5rem;
   line-height: 1.2;
   pointer-events: none;
   transition: opacity 0.15s, transform 0.15s;
