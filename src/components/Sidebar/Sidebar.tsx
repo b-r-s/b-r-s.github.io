@@ -96,7 +96,7 @@ export function Sidebar({
   showPlayAgain,
   canUndo,
   onUndo,
-  logo,
+ // logo,
   gameInProgress,
   onRestart,
   moveHistory = [],
