@@ -43,7 +43,7 @@
 .tab-button {
   flex: 1;
   padding: 0.25rem 0.1rem !important;
-  font-size: 0.5rem !important;
+  font-size: 0.75rem !important;
   font-weight: 700;
   cursor: pointer;
   border-radius: var(--radius-sm);
@@ -111,7 +111,7 @@
 
 .sidebar-title {
   margin: 0;
-  font-size: .5rem;
+  font-size: .75rem;
   /* Base size as requested */
   font-weight: 800;
   letter-spacing: -0.5px;
@@ -150,7 +150,7 @@
 
 .player-name {
   font-weight: 700;
-  font-size:  .5rem;
+  font-size:  1rem;
   color: var(--text-primary);
   display: flex;
   align-items: center;
@@ -174,13 +174,13 @@
 }
 
 .sidebar-stat-label {
-  font-size: .5rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .sidebar-stat-value {
-  font-size: .5rem;
+  font-size: .75rem;
   font-weight: bold;
   color: var(--text-primary);
   background: var(--bg-dark);
@@ -193,7 +193,7 @@
 .timer-row {
   display: flex;
   justify-content: space-between;
-  font-size: .5rem;
+  font-size: .9rem;
   color: var(--text-primary);
   font-family: monospace;
 }
@@ -204,8 +204,9 @@ button.game-button.tab-button {
 }
 
 button.game-button.new-game-btn {
-  width: 120px !important;
-  height: 34px !important;
+  width: 105px !important;
+  height: 28px !important;
+  font-size: .55rem !important;
 }
 
 .difficulty-btn {
@@ -217,7 +218,7 @@ button.game-button.new-game-btn {
   align-items: center;
   gap: 0.4rem;
   transition: all 0.2s;
-  font-size: .5rem;
+  font-size: .75rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
@@ -251,7 +252,7 @@ button.game-button.new-game-btn {
   right: 0;
   bottom: 0;
   border-radius: var(--radius-md);
-  font-size: 1.1rem;
+  font-size: 0.91rem;
   font-weight: 700;
   cursor: pointer;
   z-index: 10;
@@ -290,30 +291,27 @@ button.game-button.new-game-btn {
 }
 
 .ai-first-toggle .toggle-hint {
-  font-size: .5rem;
+  font-size: .75rem;
   opacity: 0.7;
   font-style: italic;
 }
 
 /* Undo Move Button */
 .undo-move-btn {
-  width: 80%;
+  width: 105px;
+  height: 28px;
   background-color: var(--bg-dark);
   border-color: var(--border-dark);
   color: var(--text-primary);
-  padding: .35rem 0 .35rem 0;
-  margin-top: 0.5rem;
-  margin-right: 2rem;
-  margin-left: 1rem;
   border-radius: var(--radius-md);
-  font-size: .5rem;
+  font-size: .55rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  padding: 0;
 }
 
 .undo-move-btn:active {
@@ -451,7 +449,7 @@ button.game-button.new-game-btn {
 
   .tab-button {
     padding: 0.6rem 0.4rem !important;
-    font-size: 0.5rem !important;
+    font-size: 0.75rem !important;
   }
 
   .sidebar-header-with-logo {
@@ -470,7 +468,7 @@ button.game-button.new-game-btn {
   }
 
   .sidebar-title {
-    font-size:  .5rem;
+    font-size:  .65rem;
     padding-left: 3vw;
     text-align: center;
     position: relative;
@@ -491,26 +489,26 @@ button.game-button.new-game-btn {
   }
 
   .sidebar-stat-label {
-    font-size: .5rem;
+    font-size: .65rem;
   }
 
   .sidebar-stat-value {
-    font-size: .5rem;
+    font-size: .65rem;
     margin-top: 4px;
     padding: 0.1em 0.6em;
   }
 
   .timer-row {
-    font-size: .5rem;
+    font-size: .65rem;
   }
 
   .difficulty-btn {
     padding: 0.6rem;
-    font-size: .5rem;
+    font-size: .65rem;
   }
 
   .difficulty-desc {
-    font-size: .5rem;
+    font-size: .65rem;
   }
 
   .settings-content {
@@ -533,13 +531,13 @@ button.game-button.new-game-btn {
   }
 
   .sidebar-title {
-    font-size: .5rem;
+    font-size: .65rem;
     /* Desktop size as requested */
     text-align: left;
   }
 
   .tab-button {
-    font-size: .5rem !important;
+    font-size: .65rem !important;   
   }
 }
 
@@ -568,7 +566,7 @@ button.game-button.new-game-btn {
   left: 50%;
   bottom: 125%;
   transform: translateX(-50%);
-  font-size: .5rem;
+  font-size: .65rem;
   line-height: 1.2;
   pointer-events: none;
   transition: opacity 0.15s, transform 0.15s;

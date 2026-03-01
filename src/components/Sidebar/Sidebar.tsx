@@ -180,18 +180,6 @@ export function Sidebar({
             {isActive && <span className="animate-pulse">⏱️</span>}
           </span>
           <div className="card-header-actions">
-            {/* Undo Move Button - Only for Beginner Level */}
-            {canUndo && player === 'red' && (
-              <div className="tooltip-container">
-                <button
-                  className="undo-move-btn"
-                  onClick={onUndo}
-                >
-                  Undo Move
-                </button>
-                <span className="sidebar-tooltip">Undo the last move (both yours and AI's)</span>
-              </div>
-            )}
             {/* Tip button — only on human player card */}
             {player === 'red' && createPayment && paymentStatus === 'idle' && (
               <div className="tip-btn-wrapper">
@@ -317,11 +305,17 @@ export function Sidebar({
                     className="new-game-btn"
                     label='New Game ?'
                     onClick={onRestart}
-                    width={160}
                     hue={NeonColors.Green}
-
                   />
                   <span className="sidebar-tooltip">Start a fresh match</span>
+                </div>
+              )}
+              {canUndo && (
+                <div className="tooltip-container">
+                  <button className="undo-move-btn" onClick={onUndo}>
+                    Undo Move
+                  </button>
+                  <span className="sidebar-tooltip">Undo the last move (both yours and AI's)</span>
                 </div>
               )}
             </div>
