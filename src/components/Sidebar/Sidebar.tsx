@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import React from 'react';
 import './Sidebar.css';
 import { GameButton } from '../GameButton/GameButton';
@@ -8,51 +8,6 @@ import type { GameSettings } from '../../hooks/useSettings';
 import { COLOR_THEME_LABELS, BOARD_THEME_LABELS, BOARD_COLOR_SCHEMES } from '../../utils/colorThemes';
 
 import { NeonColors } from '../../types/neon-hues';
-
-const DebugPanel = ({ lines }: { lines: string[] }) => {
-  const [localLines, setLocalLines] = React.useState<string[]>(lines);
-
-  // Read directly from localStorage on mount + every 2s
-  // React state may be stale if Pi Browser froze JS before commits
-  React.useEffect(() => {
-    const read = () => {
-      try {
-        const saved = localStorage.getItem('pi_debug_log');
-        if (saved) {
-          const parsed: string[] = JSON.parse(saved);
-          if (parsed.length > 0) setLocalLines(parsed);
-        }
-      } catch (_) {}
-    };
-    read();
-    const id = setInterval(read, 1500);
-    return () => clearInterval(id);
-  }, []);
-
-  React.useEffect(() => {
-    if (lines.length > localLines.length) setLocalLines(lines);
-  }, [lines]);
-
-  const display = localLines.length > 0 ? localLines : ['Waiting for Pi callbacks...'];
-
-  return (
-    <div style={{
-      marginTop: '8px', background: '#111', border: '1px solid #333',
-      borderRadius: '6px', padding: '8px', maxHeight: '200px',
-      overflowY: 'auto', fontFamily: 'monospace', fontSize: '10px',
-      lineHeight: '1.6', textAlign: 'left',
-    }}>
-      {display.map((line, i) => (
-        <div key={i} style={{
-          color: /FAIL|ERROR|THREW/.test(line) ? '#ff5252'
-               : /OK|resolved/.test(line) ? '#00c853'
-               : '#ccc',
-          wordBreak: 'break-all',
-        }}>{line}</div>
-      ))}
-    </div>
-  );
-};
 
 export interface SidebarProps {
   aiLevel: AILevel;
@@ -73,7 +28,6 @@ export interface SidebarProps {
   createPayment?: (amount: number, memo: string) => Promise<void>;
   paymentStatus?: 'idle' | 'pending' | 'success' | 'cancelled' | 'error';
   resetPaymentStatus?: () => void;
-  debugLog?: string[];
 }
 
 // Helper to format milliseconds to MM:SS
@@ -103,18 +57,50 @@ export function Sidebar({
   createPayment,
   paymentStatus = 'idle',
   resetPaymentStatus,
-  debugLog = [],
 }: SidebarProps) {
-  const [activeTab, setActiveTab] = useState<'game' | 'settings' | 'colors' | 'board' | 'support'>('game');
+  const [activeTab, setActiveTab] = useState<'game' | 'settings' | 'colors' | 'board'>('game');
   const [currentMoveTime, setCurrentMoveTime] = useState(0);
+  const [tipToastVisible, setTipToastVisible] = useState(false);
+  const [tipToastPos, setTipToastPos] = useState<{ top: number; right: number } | null>(null);
+  const tipBtnRef = useRef<HTMLButtonElement>(null);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Pre-warm the Vercel serverless function as soon as the Support tab is opened
-  // so the cold-start delay doesn't eat into the 60-second payment approval window.
-  useEffect(() => {
-    if (activeTab === 'support') {
-      fetch('/api/health').catch(() => {});
+  const showTipToast = useCallback(() => {
+    if (tipBtnRef.current) {
+      const rect = tipBtnRef.current.getBoundingClientRect();
+      setTipToastPos({
+        top: rect.bottom + 6,
+        right: window.innerWidth - rect.right,
+      });
     }
-  }, [activeTab]);
+    setTipToastVisible(true);
+  }, []);
+
+  const hideTipToast = useCallback(() => {
+    setTipToastVisible(false);
+    setTipToastPos(null);
+  }, []);
+
+  const handleTipTouchStart = useCallback(() => {
+    longPressTimer.current = setTimeout(() => setTipToastVisible(true), 500);
+  }, []);
+
+  const handleTipTouchEnd = useCallback(() => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+    // Keep toast visible briefly after finger lifts so user can read it
+    setTimeout(() => setTipToastVisible(false), 2500);
+  }, []);
+
+  // Auto-dismiss the success tip message after 2 seconds
+  useEffect(() => {
+    if (paymentStatus === 'success') {
+      const t = setTimeout(() => resetPaymentStatus?.(), 2000);
+      return () => clearTimeout(t);
+    }
+  }, [paymentStatus, resetPaymentStatus]);
 
   // Get winner from scores if available (winner is set when total is not 0 and the other is 0 or game is over)
   // actually, we need to know if the game is over. We'll infer from totalTime: if both timers are not running and showPlayAgain is true, stop timer.
@@ -193,19 +179,73 @@ export function Sidebar({
             {isAI && <span className="ai-difficulty-label"> {aiLevel.charAt(0).toUpperCase() + aiLevel.slice(1)}</span >}
             {isActive && <span className="animate-pulse">⏱️</span>}
           </span>
-          {/* Undo Move Button - Only for Beginner Level */}
-          {canUndo && player === 'red' && (
-            <div className="tooltip-container">
-              <button
-                className="undo-move-btn"
-                onClick={onUndo}
+          <div className="card-header-actions">
+            {/* Undo Move Button - Only for Beginner Level */}
+            {canUndo && player === 'red' && (
+              <div className="tooltip-container">
+                <button
+                  className="undo-move-btn"
+                  onClick={onUndo}
+                >
+                  Undo Move
+                </button>
+                <span className="sidebar-tooltip">Undo the last move (both yours and AI's)</span>
+              </div>
+            )}
+            {/* Tip button — only on human player card */}
+            {player === 'red' && createPayment && paymentStatus === 'idle' && (
+              <div className="tip-btn-wrapper">
+                <button
+                  ref={tipBtnRef}
+                  className="tip-btn"
+                  onMouseEnter={showTipToast}
+                  onMouseLeave={hideTipToast}
+                  onTouchStart={handleTipTouchStart}
+                  onTouchEnd={handleTipTouchEnd}
+                  onClick={() => {
+                    hideTipToast();
+                    fetch('/api/health').catch(() => {});
+                    resetPaymentStatus?.();
+                    createPayment(0.5, 'Tip for Checkers4Pi — Thank you!');
+                  }}
+                  aria-label="Send a 0.5 π tip"
+                >
+                  $
+                </button>
+              </div>
+            )}
+            {tipToastVisible && tipToastPos && (
+              <div
+                className="tip-info-toast"
+                role="tooltip"
+                style={{ top: tipToastPos.top, right: tipToastPos.right }}
               >
-                Undo Move
-              </button>
-              <span className="sidebar-tooltip">Undo the last move (both yours and AI's)</span>
-            </div>
-          )}
+                Checkers4Pi is free, always. If you enjoy it, send a small tip in Test Pi — it costs you nothing real and helps confirm Pi ecosystem connectivity. 🙏
+                <span className="tip-info-cta">Tap <strong>$</strong> to send 0.5π.</span>
+              </div>
+            )}
+          </div>
         </div>
+        {/* Inline payment status — human player only */}
+        {player === 'red' && paymentStatus !== 'idle' && (
+          <div className="tip-status">
+            {paymentStatus === 'pending' && (
+              <span className="tip-status-pending">⏳ Processing payment in Pi Browser…</span>
+            )}
+            {paymentStatus === 'success' && (
+              <span className="tip-status-success">
+                ✅ Tip received! Thank you 🎉
+                <button className="tip-reset-btn" onClick={resetPaymentStatus}>✕</button>
+              </span>
+            )}
+            {(paymentStatus === 'cancelled' || paymentStatus === 'error') && (
+              <span className="tip-status-fail">
+                {paymentStatus === 'cancelled' ? '❌ Cancelled.' : '❌ Error, try again.'}
+                <button className="tip-reset-btn" onClick={resetPaymentStatus}>Dismiss</button>
+              </span>
+            )}
+          </div>
+        )}
         <div className="sidebar-stat-breakdown">
           {STAT_KEYS.map((key) => {
             const val = key === 'moves' ? playerMoves : score[key as keyof typeof score];
@@ -258,13 +298,6 @@ export function Sidebar({
           hoverHue={NeonColors.Gold}
           label='Board'
           onClick={() => setActiveTab('board')}
-          className='tab-button'
-        />
-        <GameButton
-          hue={NeonColors.Gold}
-          hoverHue={NeonColors.Purple}
-          label='π Support'
-          onClick={() => { setActiveTab('support'); resetPaymentStatus?.(); }}
           className='tab-button'
         />
       </div>
@@ -399,54 +432,6 @@ export function Sidebar({
                   </button>
                 );
               })}
-            </div>
-          </>
-        ) : activeTab === 'support' ? (
-          <>
-            <h2 className="sidebar-title">Support This App</h2>
-            <div className="settings-content">
-              <p className="difficulty-desc">
-                Checkers4Pi is free, always. If you enjoy it,
-                send a small tip in Test Pi — it costs you nothing real
-                and helps confirm Pi ecosystem connectivity. 🙏
-              </p>
-              {paymentStatus === 'idle' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {[0.1, 0.5, 1].map((amt) => (
-                    <button
-                      key={amt}
-                      className="difficulty-btn"
-                      onClick={() => createPayment?.(amt, `Tip for Checkers4Pi — Thank you!`)}
-                      disabled={!createPayment}
-                    >
-                      π {amt} — Tip the Developer
-                    </button>
-                  ))}
-                </div>
-              )}
-              {paymentStatus === 'pending' && (
-                <div>
-                  <p className="difficulty-desc" style={{ color: '#f0b90b' }}>⏳ Processing payment in Pi Browser…</p>
-                  <DebugPanel lines={debugLog} />
-                </div>
-              )}
-              {paymentStatus === 'success' && (
-                <p className="difficulty-desc" style={{ color: '#00c853' }}>✅ Thank you! Your tip was received. 🎉</p>
-              )}
-              {paymentStatus === 'cancelled' && (
-                <>
-                  <p className="difficulty-desc" style={{ color: '#888' }}>Payment cancelled. No Pi was sent.</p>
-                  {debugLog.length > 0 && <DebugPanel lines={debugLog} />}
-                  <button className="difficulty-btn" onClick={resetPaymentStatus}>Try Again</button>
-                </>
-              )}
-              {paymentStatus === 'error' && (
-                <>
-                  <p className="difficulty-desc" style={{ color: '#ff5252' }}>❌ Something went wrong. Please try again.</p>
-                  {debugLog.length > 0 && <DebugPanel lines={debugLog} />}
-                  <button className="difficulty-btn" onClick={resetPaymentStatus}>Try Again</button>
-                </>
-              )}
             </div>
           </>
         ) : null}

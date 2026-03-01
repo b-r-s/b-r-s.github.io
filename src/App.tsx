@@ -49,7 +49,7 @@ function App() {
   const [showInstructions, setShowInstructions] = useState(false);
 
   // Pi Network authentication
-  const { authenticate, createPayment, paymentStatus, resetPaymentStatus, debugLog } = usePiNetwork();
+  const { authenticate, createPayment, paymentStatus, resetPaymentStatus } = usePiNetwork();
   const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
@@ -220,7 +220,6 @@ function App() {
             createPayment={createPayment}
             paymentStatus={paymentStatus}
             resetPaymentStatus={resetPaymentStatus}
-            debugLog={debugLog}
           />
         </div>
       )}

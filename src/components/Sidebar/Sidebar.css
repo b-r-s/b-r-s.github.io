@@ -320,6 +320,99 @@ button.game-button.new-game-btn {
   transform: translateY(0);
 }
 
+/* Card header right-side action group */
+.card-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Tip ($) button */
+.tip-btn-wrapper {
+  display: inline-flex;
+  align-items: center;
+}
+
+.tip-btn {
+  background: transparent;
+  border: 1px solid rgba(240, 185, 11, 0.45);
+  color: rgba(240, 185, 11, 0.85);
+  border-radius: var(--radius-sm);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.4rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.tip-btn:hover {
+  background: rgba(240, 185, 11, 0.15);
+  color: #f0b90b;
+  border-color: #f0b90b;
+}
+
+/* Toast that appears on hover (desktop) and long-press (mobile) */
+.tip-info-toast {
+  position: fixed;
+  width: 220px;
+  background: #1a1a2e;
+  border: 1px solid rgba(240, 185, 11, 0.4);
+  border-radius: var(--radius-md);
+  padding: 0.55rem 0.65rem;
+  font-size: 0.55rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  z-index: 9999;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  animation: fadeInToast 0.15s ease;
+}
+
+@keyframes fadeInToast {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.tip-info-cta {
+  display: block;
+  margin-top: 0.4rem;
+  color: rgba(240, 185, 11, 0.9);
+  font-weight: 600;
+  border-top: 1px solid rgba(240, 185, 11, 0.2);
+  padding-top: 0.35rem;
+}
+
+/* Inline tip status bar */
+.tip-status {
+  font-size: 0.5rem;
+  padding: 0.2rem 0.3rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.tip-status-pending { color: #f0b90b; }
+.tip-status-success { color: #00c853; }
+.tip-status-fail    { color: #888; }
+
+/* Dismiss / ✕ button inside tip status */
+.tip-reset-btn {
+  background: transparent;
+  border: 1px solid currentColor;
+  color: inherit;
+  border-radius: var(--radius-sm);
+  font-size: 0.5rem;
+  padding: 0.1rem 0.35rem;
+  cursor: pointer;
+  margin-left: 0.4rem;
+  transition: opacity 0.2s;
+}
+
+.tip-reset-btn:hover { opacity: 0.7; }
+
 /* New Game Button (Mini) */
 .btn-new-game-mini {
   padding: 0.35rem 0.6rem;
