@@ -13,7 +13,7 @@ Our goal is to provide a high-performance, intellectually stimulating strategy g
 Checkers4Pi is more than just a game; it's a utility tool for the community. By offering a custom-built AI engine (Minimax with Alpha-Beta pruning) across three difficulty levels, we provide a consistent reason for Pioneers to visit and interact within the Pi Browser daily.
 
 ### 2. Technical Excellence
-The application is built using modern, clean-code standards (React 19 & TypeScript). Every touch target, animation, and color choice (Amethyst & Gold) has been optimized for the mobile web-view to ensure a "native-feel" with zero latency.
+The application is built using modern, clean-code standards (React 19 & TypeScript). Every touch target, animation, and color choice (Amethyst & Orange) has been optimized for the mobile web-view to ensure a "native-feel" with zero latency.
 
 ### 3. Sustainability & Zero-Monetization
 **Checkers4Pi is, and will always be, 100% free for Pioneers.**

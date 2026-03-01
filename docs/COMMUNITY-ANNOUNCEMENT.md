@@ -10,7 +10,7 @@ Checkers4Pi brings professional-grade strategy to the Pi Browser. While many mob
 
 ## ✨ Key Features for Pioneers
 - **Advanced AI Strategy:** Choose from three difficulty levels powered by an optimized **3:2 King-to-Piece** weighting engine.
-- **Pi-First Design:** Fully integrated with the Pi SDK for secure authentication and a custom "Blue Horizon" high-contrast theme.
+- **Pi-First Design:** Fully integrated with the Pi SDK for secure authentication and a custom "Amethyst Horizon" high-contrast theme.
 - **Mandatory Jump Logic:** Strict adherence to Standard American Checkers rules for fair play.
 - **Privacy-First:** Zero data collection. No access to personal files or tracking—just pure strategy.
 
