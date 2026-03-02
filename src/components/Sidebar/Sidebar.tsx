@@ -31,6 +31,7 @@ export interface SidebarProps {
   isPaused?: boolean;
   onTogglePause?: () => void;
   isAiTurn?: boolean;
+  playerMoveCounts?: { red: number; black: number };
 }
 
 // Helper to format milliseconds to MM:SS
@@ -63,6 +64,7 @@ export function Sidebar({
   isPaused = false,
   onTogglePause,
   isAiTurn = false,
+  playerMoveCounts,
 }: SidebarProps) {
   const [activeTab, setActiveTab] = useState<'game' | 'settings' | 'colors' | 'board'>('game');
   const [currentMoveTime, setCurrentMoveTime] = useState(0);
@@ -132,7 +134,7 @@ export function Sidebar({
     },
     power: {
       name: 'Power',
-      tooltip: 'Total value of your kings (each king = 5).',
+      tooltip: 'King bonus — 0 until a piece is crowned.',
     },
     strategy: {
       name: 'Strategy',
@@ -172,7 +174,9 @@ export function Sidebar({
       colorClassName = 'color-indicator color-black';
     }
 
-    const playerMoves = moveHistory.filter(m => m.playerBefore === player).length;
+    const playerMoves = playerMoveCounts
+      ? playerMoveCounts[player]
+      : moveHistory.filter(m => m.playerBefore === player).length;
 
     return (
       <div className={`player-score-card ${isActive ? 'active' : ''}`}>

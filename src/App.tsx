@@ -245,6 +245,7 @@ function App() {
             onRestart={handleRestart}
             moveHistory={gameState.moveHistory}
             canUndo={gameState.aiLevel === 'beginner' && gameState.moveHistory.length >= 2 && !gameState.isAiTurn && !gameState.winner}
+            playerMoveCounts={gameState.playerMoveCounts}
             isPaused={isPaused}
             onTogglePause={() => setIsPaused(p => !p)}
             isAiTurn={gameState.isAiTurn}

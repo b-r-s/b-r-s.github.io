@@ -68,6 +68,7 @@ export const useGameState = (
       totalTime: { red: 0, black: 0 },
       moveHistory: [],
       moveCount: 0,
+      playerMoveCounts: { red: 0, black: 0 },
     };
   });
 
@@ -275,6 +276,10 @@ export const useGameState = (
         lastHumanMove: humanMoveEffect, // Update effect trigger
         moveHistory: newMoveHistory,
         moveCount: newMoveCount,
+        playerMoveCounts: {
+          ...prevState.playerMoveCounts,
+          [prevState.currentPlayer]: prevState.playerMoveCounts[prevState.currentPlayer] + 1
+        },
         isAiTurn: false,
       };
 
@@ -365,7 +370,8 @@ export const useGameState = (
                 trail: { startSquare, capturedSquares: [...capturedSquares], landingSquares: [...landingSquares] }
               },
               moveHistory: newHistory,
-              moveCount: newMoveCount
+              moveCount: newMoveCount,
+              playerMoveCounts: { ...prev.playerMoveCounts, black: prev.playerMoveCounts.black + 1 }
             }));
             return;
           }
@@ -459,7 +465,8 @@ export const useGameState = (
             trail
           },
           moveHistory: newHistory,
-          moveCount: newCount
+          moveCount: newCount,
+          playerMoveCounts: { ...prev.playerMoveCounts, black: prev.playerMoveCounts.black + 1 }
         }));
       }
     }, 1000);
@@ -615,6 +622,10 @@ export const useGameState = (
         turnStartTime: entryToRestore.timeBefore.turnStartTime,
         totalTime: entryToRestore.timeBefore.totalTime,
         moveHistory: prev.moveHistory.slice(0, -2), // Remove last 2 moves
+        playerMoveCounts: {
+          red: Math.max(0, prev.playerMoveCounts.red - 1),
+          black: Math.max(0, prev.playerMoveCounts.black - 1),
+        },
         lastUndoMove: undoVisual,
         lastAIMove: undefined,
         selectedPosition: null,
@@ -662,6 +673,7 @@ export const useGameState = (
         moveHistory: [],
         lastUndoMove: undefined,
         moveCount: 0,
+        playerMoveCounts: { red: 0, black: 0 },
       };
     });
     setMultiJumpSource(null);

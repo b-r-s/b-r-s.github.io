@@ -96,4 +96,5 @@ export interface GameState {
   };
   moveHistory: MoveHistoryEntry[];
   moveCount: number;
+  playerMoveCounts: { red: number; black: number };
 }
