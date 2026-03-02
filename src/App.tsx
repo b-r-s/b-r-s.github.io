@@ -48,11 +48,6 @@ function App() {
   // giving the user time to finish configuring before the AI fires.
   const [humanReady, setHumanReady] = useState(true);
 
-  const resolveHumanReady = (currentSettings = settings, currentAILevel = gameState?.aiLevel) => {
-    const needsOverlay = currentSettings.aiMovesFirst && currentAILevel === 'advanced';
-    setHumanReady(!needsOverlay);
-  };
-
   const { gameState, handleTileClick, movePiece, setAILevel, restartGame, undoMove, clearUndoHighlight, toastMessage } = useGameState(settings, undefined, humanReady);
   const [showPlayAgain, setShowPlayAgain] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
@@ -83,12 +78,10 @@ function App() {
 
   const handleRestart = () => {
     setShowPlayAgain(false);
-    resolveHumanReady();
     restartGame();
   };
 
   const handleStartGame = () => {
-    resolveHumanReady();
     setShowSplash(false);
   };
 
@@ -103,11 +96,19 @@ function App() {
   // When aiMovesFirst setting changes and no moves have been made, restart to apply
   useEffect(() => {
     if (gameState.moveCount === 0 && !showSplash) {
-      resolveHumanReady();
       restartGame();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings.aiMovesFirst]);
+
+  // Reactively gate the AI's first move: show overlay whenever game resets
+  // to move 0 with aiMovesFirst active. Tap-to-begin sets humanReady = true.
+  useEffect(() => {
+    if (gameState.moveCount === 0) {
+      const needsOverlay = settings.aiMovesFirst && gameState.aiLevel === 'advanced';
+      setHumanReady(!needsOverlay);
+    }
+  }, [gameState.moveCount, settings.aiMovesFirst, gameState.aiLevel]);
 
   // Apply board colors as CSS variables
   useEffect(() => {
