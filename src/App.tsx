@@ -93,10 +93,11 @@ function App() {
     setShowInstructions(false);
   };
 
-  // When aiMovesFirst setting changes and no moves have been made, restart to apply
+  // When aiMovesFirst setting changes and no moves have been made, restart to apply.
+  // Pass false so the current AI level is preserved (needed for the overlay check).
   useEffect(() => {
     if (gameState.moveCount === 0 && !showSplash) {
-      restartGame();
+      restartGame(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings.aiMovesFirst]);

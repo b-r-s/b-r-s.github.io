@@ -636,14 +636,17 @@ export const useGameState = (
     setMultiJumpSource(null);
   }, []);
 
-  const restartGame = useCallback(() => {
+  const restartGame = useCallback((resetLevel = true) => {
     const initialBoard = createInitialBoard();
     const redScore = calculateScore(initialBoard, 'red');
     const blackScore = calculateScore(initialBoard, 'black');
 
     setGameState(prev => {
-      // Always reset AI level to the current difficulty setting (not carry over from last game)
-      const aiLevel = getAILevelFromDifficulty(settings.difficulty);
+      // resetLevel=true (New Game button): reset to default difficulty (Intermediate)
+      // resetLevel=false (aiMovesFirst toggle): keep current in-game level so overlay check works
+      const aiLevel = resetLevel
+        ? getAILevelFromDifficulty(settings.difficulty)
+        : prev.aiLevel;
       // AI moves first only in advanced mode when setting is enabled
       const aiMovesFirst = aiLevel === 'advanced' && settings.aiMovesFirst;
 
