@@ -7,7 +7,8 @@ import { useGameState } from './hooks/useGameState';
 import { useSettings } from './hooks/useSettings';
 import { BOARD_COLOR_SCHEMES } from './utils/colorThemes';
 import { getContrastingHighlightColor } from './utils/contrastUtils';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import type { AILevel } from './types/game';
 import { usePiNetwork } from './hooks/usePiNetwork';
 import logo from './assets/icon-192x192.png';
 
@@ -47,6 +48,7 @@ function App() {
   // humanReady gates the AI's very first move when 'aiMovesFirst' is enabled,
   // giving the user time to finish configuring before the AI fires.
   const [humanReady, setHumanReady] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
 
   const { gameState, handleTileClick, movePiece, setAILevel, restartGame, undoMove, clearUndoHighlight, toastMessage } = useGameState(settings, undefined, humanReady);
   const [showPlayAgain, setShowPlayAgain] = useState(false);
@@ -76,8 +78,20 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Sync AI level to settings so 'lock' persists correctly
+  const handleAILevelChange = useCallback((level: AILevel) => {
+    setAILevel(level);
+    updateSettings({ difficulty: level });
+  }, [setAILevel, updateSettings]);
+
+  // Block tile clicks while paused
+  const handleTileClickWithPause = useCallback((r: number, c: number) => {
+    if (!isPaused) handleTileClick(r, c);
+  }, [isPaused, handleTileClick]);
+
   const handleRestart = () => {
     setShowPlayAgain(false);
+    setIsPaused(false);
     restartGame();
   };
 
@@ -207,7 +221,7 @@ function App() {
           <div className="main-content">
             <Board
               gameState={gameState}
-              onTileClick={handleTileClick}
+              onTileClick={handleTileClickWithPause}
               onMovePiece={movePiece}
               onRestart={handleRestart}
               onClearUndoHighlight={clearUndoHighlight}
@@ -220,7 +234,7 @@ function App() {
           </div>
           <Sidebar
             aiLevel={gameState.aiLevel}
-            onAILevelChange={setAILevel}
+            onAILevelChange={handleAILevelChange}
             scores={gameState.scores}
             currentPlayer={gameState.currentPlayer}
             turnStartTime={gameState.turnStartTime}
@@ -231,6 +245,9 @@ function App() {
             onRestart={handleRestart}
             moveHistory={gameState.moveHistory}
             canUndo={gameState.aiLevel === 'beginner' && gameState.moveHistory.length >= 2 && !gameState.isAiTurn && !gameState.winner}
+            isPaused={isPaused}
+            onTogglePause={() => setIsPaused(p => !p)}
+            isAiTurn={gameState.isAiTurn}
             onUndo={undoMove}
             logo={logo}
             gameInProgress={gameState.moveCount > 0}

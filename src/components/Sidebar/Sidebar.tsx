@@ -28,6 +28,9 @@ export interface SidebarProps {
   createPayment?: (amount: number, memo: string) => Promise<void>;
   paymentStatus?: 'idle' | 'pending' | 'success' | 'cancelled' | 'error';
   resetPaymentStatus?: () => void;
+  isPaused?: boolean;
+  onTogglePause?: () => void;
+  isAiTurn?: boolean;
 }
 
 // Helper to format milliseconds to MM:SS
@@ -57,6 +60,9 @@ export function Sidebar({
   createPayment,
   paymentStatus = 'idle',
   resetPaymentStatus,
+  isPaused = false,
+  onTogglePause,
+  isAiTurn = false,
 }: SidebarProps) {
   const [activeTab, setActiveTab] = useState<'game' | 'settings' | 'colors' | 'board'>('game');
   const [currentMoveTime, setCurrentMoveTime] = useState(0);
@@ -107,12 +113,12 @@ export function Sidebar({
   // Update current move timer every 100ms, but only after the first move has been made
   // and stop if game is over. This prevents the timer from running before any move is made.
   useEffect(() => {
-    if (gameOver || !gameInProgress) return;
+    if (gameOver || !gameInProgress || isPaused) return;
     const interval = setInterval(() => {
       setCurrentMoveTime(Date.now() - turnStartTime);
     }, 100);
     return () => clearInterval(interval);
-  }, [turnStartTime, gameOver, gameInProgress]);
+  }, [turnStartTime, gameOver, gameInProgress, isPaused]);
 
   // Derive the displayed move time — 0:00 until the game actually starts
   const displayedMoveTime = gameInProgress ? currentMoveTime : 0;
@@ -329,6 +335,19 @@ export function Sidebar({
                   <span className="sidebar-tooltip">Undo the last move (both yours and AI's)</span>
                 </div>
               )}
+              {gameInProgress && (
+                <div className="tooltip-container">
+                  <button
+                    className={`pause-btn${isPaused ? ' paused' : ''}`}
+                    onClick={onTogglePause}
+                    disabled={isAiTurn}
+                    title={isAiTurn ? 'Cannot pause during AI turn' : isPaused ? 'Resume game' : 'Pause game'}
+                  >
+                    {isPaused ? '▶ Resume' : '⏸ Pause'}
+                  </button>
+                  <span className="sidebar-tooltip">{isAiTurn ? 'Wait for AI to finish' : isPaused ? 'Resume the game' : 'Pause the clock & input'}</span>
+                </div>
+              )}
             </div>
             <div className="match-stats-container">
               {renderPlayerScore('red')}
@@ -364,6 +383,16 @@ export function Sidebar({
               >
                 <span>🔴</span> Advanced
               </button>
+
+              {/* Lock AI Level toggle - always available */}
+              <label className="ai-first-toggle">
+                <input
+                  type="checkbox"
+                  checked={settings.lockAILevel}
+                  onChange={(e) => onSettingsChange({ lockAILevel: e.target.checked })}
+                />
+                <span>Remember this level for new games</span>
+              </label>
 
               {/* AI Moves First toggle - only for Advanced level, disabled once game starts */}
               {aiLevel === 'advanced' && (

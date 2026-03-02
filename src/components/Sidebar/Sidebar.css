@@ -322,6 +322,35 @@ button.game-button.new-game-btn {
   transform: translateY(0);
 }
 
+/* Pause / Resume Button */
+.pause-btn {
+  width: 86px;
+  height: 28px;
+  background-color: var(--bg-dark);
+  border: 1px solid var(--border-dark);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  font-size: .55rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.pause-btn.paused {
+  background-color: var(--neon-green, #39ff14);
+  color: #000;
+  border-color: var(--neon-green, #39ff14);
+}
+
+.pause-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* Card header right-side action group */
 .card-header-actions {
   display: flex;

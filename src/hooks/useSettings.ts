@@ -1,25 +1,34 @@
 import { useState, useEffect } from 'react';
-
+import type { AILevel } from '../types/game';
 import type { PlayerColorTheme, BoardColorTheme } from '../types/game';
 
-export type Difficulty = 'easy' | 'medium' | 'hard';
-
 export interface GameSettings {
-  difficulty: Difficulty;
+  difficulty: AILevel;         // 'beginner' | 'intermediate' | 'advanced'
   soundEnabled: boolean;
   showHints: boolean;
   playerColor: PlayerColorTheme;
   boardColors: BoardColorTheme;
   aiMovesFirst: boolean;
+  lockAILevel: boolean;
 }
 
 const DEFAULT_SETTINGS: GameSettings = {
-  difficulty: 'medium',
+  difficulty: 'intermediate',
   soundEnabled: true,
   showHints: false,
   playerColor: 'red',
   boardColors: 'classic',
   aiMovesFirst: false,
+  lockAILevel: false,
+};
+
+// Migrate any old easy/medium/hard values stored in localStorage
+const migrateDifficulty = (d: unknown): AILevel => {
+  if (d === 'easy')   return 'beginner';
+  if (d === 'medium') return 'intermediate';
+  if (d === 'hard')   return 'advanced';
+  if (d === 'beginner' || d === 'intermediate' || d === 'advanced') return d;
+  return 'intermediate';
 };
 
 export const useSettings = () => {
@@ -31,9 +40,13 @@ export const useSettings = () => {
       const stored = localStorage.getItem('checkers4pi-settings');
       if (stored) {
         const parsedSettings = JSON.parse(stored);
-        // aiMovesFirst is intentionally NOT restored from storage —
-        // it's an opt-in extra challenge that should always default to off.
-        setSettings({ ...DEFAULT_SETTINGS, ...parsedSettings, aiMovesFirst: false });
+        setSettings({
+          ...DEFAULT_SETTINGS,
+          ...parsedSettings,
+          // Migrate old easy/medium/hard values and always reset opt-in flags
+          difficulty: migrateDifficulty(parsedSettings.difficulty),
+          aiMovesFirst: false,
+        });
       }
     } catch (error) {
       console.warn('Failed to load settings from storage:', error);

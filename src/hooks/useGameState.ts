@@ -41,16 +41,6 @@ export const useGameState = (
   humanReady: boolean = true
 ) => {
   const { getBestMove } = useAI();
-
-  // Map difficulty settings to AI levels
-  const getAILevelFromDifficulty = (difficulty: 'easy' | 'medium' | 'hard'): 'beginner' | 'intermediate' | 'advanced' => {
-    switch (difficulty) {
-      case 'easy': return 'beginner';
-      case 'medium': return 'intermediate';
-      case 'hard': return 'advanced';
-      default: return 'intermediate';
-    }
-  };
   /*
     Main state container for the game.
     We track everything here: the board, whose turn it is, scores, and time.
@@ -59,7 +49,7 @@ export const useGameState = (
     const initialBoard = createInitialBoard();
     const redScore = calculateScore(initialBoard, 'red');
     const blackScore = calculateScore(initialBoard, 'black');
-    const aiLevel = getAILevelFromDifficulty(settings.difficulty);
+    const aiLevel = settings.difficulty;
     const aiMovesFirst = aiLevel === 'advanced' && settings.aiMovesFirst;
     return {
       board: initialBoard,
@@ -642,11 +632,15 @@ export const useGameState = (
     const blackScore = calculateScore(initialBoard, 'black');
 
     setGameState(prev => {
-      // resetLevel=true (New Game button): reset to default difficulty (Intermediate)
-      // resetLevel=false (aiMovesFirst toggle): keep current in-game level so overlay check works
-      const aiLevel = resetLevel
-        ? getAILevelFromDifficulty(settings.difficulty)
-        : prev.aiLevel;
+      // resetLevel=true (New Game button): reset based on lockAILevel setting
+      //   - lockAILevel on  → use settings.difficulty (user's saved preference)
+      //   - lockAILevel off → always default to 'intermediate'
+      // resetLevel=false (aiMovesFirst toggle): keep current in-game level for overlay check
+      const aiLevel = !resetLevel
+        ? prev.aiLevel
+        : settings.lockAILevel
+          ? settings.difficulty
+          : 'intermediate';
       // AI moves first only in advanced mode when setting is enabled
       const aiMovesFirst = aiLevel === 'advanced' && settings.aiMovesFirst;
 
@@ -672,7 +666,7 @@ export const useGameState = (
     });
     setMultiJumpSource(null);
     setToastMessage(null);
-  }, [settings.aiMovesFirst, settings.difficulty]);
+  }, [settings.aiMovesFirst, settings.difficulty, settings.lockAILevel]);
 
   const clearUndoHighlight = useCallback(() => {
     setGameState(prev => ({
