@@ -332,7 +332,22 @@ button.game-button.new-game-btn {
 .tip-btn-wrapper {
   display: inline-flex;
   align-items: center;
+  gap: 0.2rem;
 }
+
+/* ⓘ info button */
+.tip-info-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.45);
+  font-size: 0.7rem;
+  line-height: 1;
+  padding: 0 0.1rem;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.tip-info-btn:hover,
+.tip-info-btn:active { color: rgba(255,255,255,0.85); }
 
 .tip-btn {
   background: transparent;

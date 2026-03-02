@@ -62,13 +62,12 @@ export function Sidebar({
   const [currentMoveTime, setCurrentMoveTime] = useState(0);
   const [tipToastVisible, setTipToastVisible] = useState(false);
   const [tipToastPos, setTipToastPos] = useState<{ top: number; right: number } | null>(null);
-  const tipBtnRef = useRef<HTMLButtonElement>(null);
-  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const toastWasVisible = useRef(false); // track whether toast was already open when touch started
+  const tipInfoBtnRef = useRef<HTMLButtonElement>(null);
+  const toastHideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const showTipToast = useCallback(() => {
-    if (tipBtnRef.current) {
-      const rect = tipBtnRef.current.getBoundingClientRect();
+    if (tipInfoBtnRef.current) {
+      const rect = tipInfoBtnRef.current.getBoundingClientRect();
       setTipToastPos({
         top: rect.bottom + 6,
         right: window.innerWidth - rect.right,
@@ -82,29 +81,16 @@ export function Sidebar({
     setTipToastPos(null);
   }, []);
 
-  const handleTipTouchStart = useCallback(() => {
-    // Remember whether toast was already visible BEFORE this touch
-    toastWasVisible.current = tipToastVisible;
+  // ⓘ button touch: show toast on tap, auto-hide after a delay
+  const handleInfoTouchStart = useCallback((e: React.TouchEvent) => {
+    e.preventDefault(); // block synthesized click
+    if (toastHideTimer.current) {
+      clearTimeout(toastHideTimer.current);
+      toastHideTimer.current = null;
+    }
     showTipToast();
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-  }, [tipToastVisible, showTipToast]);
-
-  const handleTipTouchEnd = useCallback((e: React.TouchEvent) => {
-    // Block the synthesized mouse-click that follows a touch
-    e.preventDefault();
-    if (toastWasVisible.current) {
-      // Second deliberate tap while toast was showing → trigger payment
-      hideTipToast();
-      resetPaymentStatus?.();
-      createPayment?.(0.5, 'Tip for Checkers4Pi — Thank you!');
-    } else {
-      // First tap — toast is now visible; auto-hide after a delay
-      longPressTimer.current = setTimeout(() => setTipToastVisible(false), 2500);
-    }
-  }, [hideTipToast, createPayment, resetPaymentStatus]);
+    toastHideTimer.current = setTimeout(() => setTipToastVisible(false), 3000);
+  }, [showTipToast]);
 
   // Auto-dismiss the success tip message after 2 seconds
   useEffect(() => {
@@ -199,16 +185,22 @@ export function Sidebar({
                 <button className="tip-reset-btn" onClick={resetPaymentStatus}>✕</button>
               </span>
             )}
-            {/* Tip button — only on human player card */}
+            {/* ⓘ info + $ pay buttons — only on human player card */}
             {player === 'red' && createPayment && paymentStatus === 'idle' && (
               <div className="tip-btn-wrapper">
                 <button
-                  ref={tipBtnRef}
-                  className="tip-btn"
+                  ref={tipInfoBtnRef}
+                  className="tip-info-btn"
                   onMouseEnter={showTipToast}
                   onMouseLeave={hideTipToast}
-                  onTouchStart={handleTipTouchStart}
-                  onTouchEnd={handleTipTouchEnd}
+                  onTouchStart={handleInfoTouchStart}
+                  onClick={showTipToast}
+                  aria-label="About tipping"
+                >
+                  ⓘ
+                </button>
+                <button
+                  className="tip-btn"
                   onClick={() => {
                     hideTipToast();
                     fetch('/api/health').catch(() => {});
