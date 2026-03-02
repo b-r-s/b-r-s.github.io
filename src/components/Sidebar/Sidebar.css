@@ -269,7 +269,8 @@ button.game-button.new-game-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: .5rem;
+  font-size: 0.75rem;
+  color: var(--text-primary);
   padding: 0.5rem 0.6rem;
   border-radius: var(--radius-md);
   margin-top: 0.5rem;
