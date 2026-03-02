@@ -82,16 +82,18 @@ export function Sidebar({
   }, []);
 
   const handleTipTouchStart = useCallback(() => {
-    longPressTimer.current = setTimeout(() => setTipToastVisible(true), 500);
-  }, []);
-
-  const handleTipTouchEnd = useCallback(() => {
+    // Show immediately on any touch (tap or long-press)
+    showTipToast();
+    // Clear any previous hide timer if button is touched again
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
     }
-    // Keep toast visible briefly after finger lifts so user can read it
-    setTimeout(() => setTipToastVisible(false), 2500);
+  }, [showTipToast]);
+
+  const handleTipTouchEnd = useCallback(() => {
+    // Auto-hide after a short delay so user can read the toast
+    longPressTimer.current = setTimeout(() => setTipToastVisible(false), 2500);
   }, []);
 
   // Auto-dismiss the success tip message after 2 seconds
