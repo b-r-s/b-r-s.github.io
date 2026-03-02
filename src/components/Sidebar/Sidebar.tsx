@@ -64,6 +64,7 @@ export function Sidebar({
   const [tipToastPos, setTipToastPos] = useState<{ top: number; right: number } | null>(null);
   const tipBtnRef = useRef<HTMLButtonElement>(null);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const toastWasVisible = useRef(false); // track whether toast was already open when touch started
 
   const showTipToast = useCallback(() => {
     if (tipBtnRef.current) {
@@ -82,19 +83,28 @@ export function Sidebar({
   }, []);
 
   const handleTipTouchStart = useCallback(() => {
-    // Show immediately on any touch (tap or long-press)
+    // Remember whether toast was already visible BEFORE this touch
+    toastWasVisible.current = tipToastVisible;
     showTipToast();
-    // Clear any previous hide timer if button is touched again
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
     }
-  }, [showTipToast]);
+  }, [tipToastVisible, showTipToast]);
 
-  const handleTipTouchEnd = useCallback(() => {
-    // Auto-hide after a short delay so user can read the toast
-    longPressTimer.current = setTimeout(() => setTipToastVisible(false), 2500);
-  }, []);
+  const handleTipTouchEnd = useCallback((e: React.TouchEvent) => {
+    // Block the synthesized mouse-click that follows a touch
+    e.preventDefault();
+    if (toastWasVisible.current) {
+      // Second deliberate tap while toast was showing → trigger payment
+      hideTipToast();
+      resetPaymentStatus?.();
+      createPayment?.(0.5, 'Tip for Checkers4Pi — Thank you!');
+    } else {
+      // First tap — toast is now visible; auto-hide after a delay
+      longPressTimer.current = setTimeout(() => setTipToastVisible(false), 2500);
+    }
+  }, [hideTipToast, createPayment, resetPaymentStatus]);
 
   // Auto-dismiss the success tip message after 2 seconds
   useEffect(() => {
@@ -182,6 +192,13 @@ export function Sidebar({
             {isActive && <span className="animate-pulse">⏱️</span>}
           </span>
           <div className="card-header-actions">
+            {/* Cancelled feedback — inline where $ was */}
+            {player === 'red' && paymentStatus === 'cancelled' && (
+              <span className="tip-cancelled-inline">
+                ❌ Cancelled
+                <button className="tip-reset-btn" onClick={resetPaymentStatus}>✕</button>
+              </span>
+            )}
             {/* Tip button — only on human player card */}
             {player === 'red' && createPayment && paymentStatus === 'idle' && (
               <div className="tip-btn-wrapper">
@@ -216,8 +233,8 @@ export function Sidebar({
             )}
           </div>
         </div>
-        {/* Inline payment status — human player only */}
-        {player === 'red' && paymentStatus !== 'idle' && (
+        {/* Inline payment status — human player only (not cancelled, that shows inline above) */}
+        {player === 'red' && paymentStatus !== 'idle' && paymentStatus !== 'cancelled' && (
           <div className="tip-status">
             {paymentStatus === 'pending' && (
               <span className="tip-status-pending">⏳ Processing payment in Pi Browser…</span>
@@ -228,9 +245,9 @@ export function Sidebar({
                 <button className="tip-reset-btn" onClick={resetPaymentStatus}>✕</button>
               </span>
             )}
-            {(paymentStatus === 'cancelled' || paymentStatus === 'error') && (
+            {paymentStatus === 'error' && (
               <span className="tip-status-fail">
-                {paymentStatus === 'cancelled' ? '❌ Cancelled.' : '❌ Error, try again.'}
+                ❌ Error, try again.
                 <button className="tip-reset-btn" onClick={resetPaymentStatus}>Dismiss</button>
               </span>
             )}

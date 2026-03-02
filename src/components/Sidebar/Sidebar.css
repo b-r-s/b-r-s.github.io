@@ -399,6 +399,16 @@ button.game-button.new-game-btn {
 .tip-status-success { color: #00c853; }
 .tip-status-fail    { color: #888; }
 
+/* Cancelled message shown inline in the card header where $ button was */
+.tip-cancelled-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.55rem;
+  color: #6e6e6e;
+  white-space: nowrap;
+}
+
 /* Dismiss / ✕ button inside tip status */
 .tip-reset-btn {
   background: transparent;
