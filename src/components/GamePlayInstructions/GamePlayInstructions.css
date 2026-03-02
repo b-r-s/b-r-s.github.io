@@ -166,3 +166,64 @@
     color: var(--bg-primary);
   }
 }
+
+/* ── Paragraph spacing ── */
+.instruction-paragraph {
+  margin: 0.25rem 0 0.5rem;
+}
+
+/* ── Difficulty level blocks ── */
+.level-block {
+  border-left: 3px solid var(--border-dark);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 0.45rem 0.6rem;
+  margin: 0.5rem 0;
+  background: rgba(255,255,255,0.03);
+}
+.level-beginner     { border-left-color: #39ff14; }
+.level-intermediate { border-left-color: #ffe600; }
+.level-advanced     { border-left-color: #ff4444; }
+
+.level-badge {
+  display: block;
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.02em;
+}
+
+.level-details {
+  margin: 0.2rem 0 0 1rem;
+  padding: 0;
+  list-style: disc;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+.level-details li { margin-bottom: 0.2rem; }
+
+.feature-on  { color: #39ff14; font-weight: 600; }
+.feature-off { color: #888;    font-weight: 600; }
+
+/* ── Scoring grid ── */
+.scoring-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.3rem;
+}
+.scoring-row {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  align-items: start;
+}
+.scoring-label {
+  font-weight: 700;
+  color: var(--accent-light);
+  padding-top: 0.05rem;
+}
+.scoring-desc { color: var(--text-secondary, #ccc); }
+.scoring-total .scoring-label { color: #39ff14; }
+.scoring-total .scoring-desc  { color: var(--text-primary); }
