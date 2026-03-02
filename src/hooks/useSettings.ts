@@ -19,7 +19,7 @@ const DEFAULT_SETTINGS: GameSettings = {
   playerColor: 'red',
   boardColors: 'classic',
   aiMovesFirst: false,
-  lockAILevel: false,
+  lockAILevel: true,
 };
 
 // Migrate any old easy/medium/hard values stored in localStorage

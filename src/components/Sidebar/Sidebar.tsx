@@ -391,7 +391,7 @@ export function Sidebar({
                   checked={settings.lockAILevel}
                   onChange={(e) => onSettingsChange({ lockAILevel: e.target.checked })}
                 />
-                <span>Remember this level for new games</span>
+                <span>Keep this level on new games{!settings.lockAILevel && <span className="toggle-hint"> (resets to Intermediate)</span>}</span>
               </label>
 
               {/* AI Moves First toggle - only for Advanced level, disabled once game starts */}
