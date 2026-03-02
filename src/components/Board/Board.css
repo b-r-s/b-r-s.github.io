@@ -355,6 +355,15 @@
   color: rgba(255,255,255,0.75);
 }
 
+.ai-waiting-hint {
+  margin: 0;
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.6);
+  font-style: italic;
+  max-width: 220px;
+  line-height: 1.4;
+}
+
 .ai-waiting-cta {
   margin: 0.4rem 0 0;
   font-size: 0.85rem;

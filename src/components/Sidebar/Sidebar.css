@@ -669,6 +669,23 @@ button.game-button.new-game-btn {
   margin-right: 8px;
 }
 
+/* Board color picker — 2-column compact grid */
+.board-color-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.35rem;
+  padding: 0.4rem 0.5rem;
+  overflow: hidden;
+}
+
+.board-color-grid .difficulty-btn.color-btn {
+  width: 100%;
+  padding: 0.3rem 0.4rem;
+  font-size: 0.62rem;
+  margin-bottom: 0;
+  gap: 0.3rem;
+}
+
 .board-color-indicator {
   display: flex;
   gap: 3px;

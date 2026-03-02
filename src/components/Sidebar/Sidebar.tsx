@@ -414,7 +414,7 @@ export function Sidebar({
             <p className="difficulty-desc">
               Choose your board color scheme for the checkerboard.
             </p>
-            <div className="settings-content">
+            <div className="board-color-grid">
               {(Object.keys(BOARD_THEME_LABELS) as BoardColorTheme[]).map((theme) => {
                 const colors = BOARD_COLOR_SCHEMES[theme];
                 return (
