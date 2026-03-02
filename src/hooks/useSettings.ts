@@ -31,7 +31,9 @@ export const useSettings = () => {
       const stored = localStorage.getItem('checkers4pi-settings');
       if (stored) {
         const parsedSettings = JSON.parse(stored);
-        setSettings({ ...DEFAULT_SETTINGS, ...parsedSettings });
+        // aiMovesFirst is intentionally NOT restored from storage —
+        // it's an opt-in extra challenge that should always default to off.
+        setSettings({ ...DEFAULT_SETTINGS, ...parsedSettings, aiMovesFirst: false });
       }
     } catch (error) {
       console.warn('Failed to load settings from storage:', error);
