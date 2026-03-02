@@ -390,23 +390,22 @@ export function Sidebar({
         ) : activeTab === 'colors' ? (
           <>
             <h2 className="sidebar-title">Player Color</h2>
-            <div className="settings-content">
+            <div className="board-color-grid">
               {(Object.keys(COLOR_THEME_LABELS) as PlayerColorTheme[]).map((color) => (
                 <button
                   key={color}
                   className={`difficulty-btn color-btn ${settings.playerColor === color ? 'active' : ''}`}
                   onClick={() => onSettingsChange({ playerColor: color })}
                 >
-                  {/* <span className={`color-indicator color-${color}`}></span> */}
                   <div className="color-indicator" style={{ backgroundColor: color, height: '20px', width: '20px', border: '2px solid black', borderRadius: '50%' }}></div>
                   {color.charAt(0).toUpperCase() + color.slice(1)}
                   {color === 'red' && ' (Classic)'}
                 </button>
               ))}
-              <p className="difficulty-desc">
-                Choose your checker color! The AI will always use black.
-              </p>
             </div>
+            <p className="difficulty-desc">
+              Choose your checker color! The AI will always use black.
+            </p>
           </>
         ) : activeTab === 'board' ? (
           <>
