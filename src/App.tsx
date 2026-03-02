@@ -43,7 +43,17 @@ function App() {
   })();
 
   const { settings, updateSettings } = useSettings();
-  const { gameState, handleTileClick, movePiece, setAILevel, restartGame, undoMove, clearUndoHighlight, toastMessage } = useGameState(settings);
+
+  // humanReady gates the AI's very first move when 'aiMovesFirst' is enabled,
+  // giving the user time to finish configuring before the AI fires.
+  const [humanReady, setHumanReady] = useState(true);
+
+  const resolveHumanReady = (currentSettings = settings, currentAILevel = gameState?.aiLevel) => {
+    const needsOverlay = currentSettings.aiMovesFirst && currentAILevel === 'advanced';
+    setHumanReady(!needsOverlay);
+  };
+
+  const { gameState, handleTileClick, movePiece, setAILevel, restartGame, undoMove, clearUndoHighlight, toastMessage } = useGameState(settings, undefined, humanReady);
   const [showPlayAgain, setShowPlayAgain] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
   const [showInstructions, setShowInstructions] = useState(false);
@@ -73,10 +83,12 @@ function App() {
 
   const handleRestart = () => {
     setShowPlayAgain(false);
+    resolveHumanReady();
     restartGame();
   };
 
   const handleStartGame = () => {
+    resolveHumanReady();
     setShowSplash(false);
   };
 
@@ -91,6 +103,7 @@ function App() {
   // When aiMovesFirst setting changes and no moves have been made, restart to apply
   useEffect(() => {
     if (gameState.moveCount === 0 && !showSplash) {
+      resolveHumanReady();
       restartGame();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -199,6 +212,8 @@ function App() {
               toastMessage={toastMessage}
               playerColor={settings.playerColor}
               onModalFadeComplete={() => setShowPlayAgain(true)}
+              awaitingPlayerReady={!humanReady}
+              onPlayerReady={() => setHumanReady(true)}
             />
           </div>
           <Sidebar

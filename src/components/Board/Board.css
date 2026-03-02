@@ -312,6 +312,63 @@
   }
 }
 
+/* AI-moves-first waiting overlay */
+.ai-waiting-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+  cursor: pointer;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.ai-waiting-content {
+  text-align: center;
+  padding: 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ai-waiting-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.ai-waiting-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+.ai-waiting-msg {
+  margin: 0;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.75);
+}
+
+.ai-waiting-cta {
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #f0b90b;
+  letter-spacing: 0.5px;
+  animation: pulse-cta 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse-cta {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
 .trail-path-overlay {
   position: absolute;
   top: 0;

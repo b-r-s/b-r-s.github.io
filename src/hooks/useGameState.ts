@@ -37,7 +37,8 @@ const createInitialBoard = (): BoardState => {
 
 export const useGameState = (
   settings: import('./useSettings').GameSettings,
-  onGameEnd?: (winner: Player | 'draw', moveCount: number) => void
+  onGameEnd?: (winner: Player | 'draw', moveCount: number) => void,
+  humanReady: boolean = true
 ) => {
   const { getBestMove } = useAI();
 
@@ -480,7 +481,8 @@ export const useGameState = (
       gameState.currentPlayer === 'black' &&
       gameState.gameMode === 'PvAI' &&
       !gameState.winner &&
-      !gameState.isAiTurn
+      !gameState.isAiTurn &&
+      humanReady  // wait for human to dismiss the "tap to begin" overlay
     ) {
       triggerAIMove();
     }
@@ -492,7 +494,7 @@ export const useGameState = (
         clearTimeout(aiTimeoutRef.current);
       }
     };
-  }, [gameState.currentPlayer, gameState.gameMode, gameState.winner, gameState.isAiTurn, triggerAIMove]);
+  }, [gameState.currentPlayer, gameState.gameMode, gameState.winner, gameState.isAiTurn, humanReady, triggerAIMove]);
 
   /*
     Handles all user interactions with the board squares.

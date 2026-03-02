@@ -17,9 +17,11 @@ export interface BoardProps {
   toastMessage: string | null;
   playerColor: PlayerColorTheme;
   onModalFadeComplete?: () => void;
+  awaitingPlayerReady?: boolean;
+  onPlayerReady?: () => void;
 }
 
-export const Board: React.FC<BoardProps> = ({ gameState, onTileClick, onMovePiece, onClearUndoHighlight, toastMessage, playerColor, onModalFadeComplete }) => {
+export const Board: React.FC<BoardProps> = ({ gameState, onTileClick, onMovePiece, onClearUndoHighlight, toastMessage, playerColor, onModalFadeComplete, awaitingPlayerReady, onPlayerReady }) => {
   const { board, selectedPosition, validMoves, lastAIMove, lastUndoMove, winner } = gameState;
   const [draggingPos, setDraggingPos] = useState<{ row: number; col: number } | null>(null);
   const [hoveredSquare, setHoveredSquare] = useState<{ row: number; col: number } | null>(null);
@@ -396,6 +398,22 @@ export const Board: React.FC<BoardProps> = ({ gameState, onTileClick, onMovePiec
   return (
     <div className="board-container">
       {toastMessage && <div className="toast-notification">{toastMessage}</div>}
+      {awaitingPlayerReady && (
+        <div
+          className="ai-waiting-overlay"
+          onClick={onPlayerReady}
+          onTouchEnd={(e) => { e.preventDefault(); onPlayerReady?.(); }}
+          role="button"
+          aria-label="Tap to begin game"
+        >
+          <div className="ai-waiting-content">
+            <div className="ai-waiting-icon">🤖</div>
+            <p className="ai-waiting-title">AI goes first!</p>
+            <p className="ai-waiting-msg">The AI is ready to make its opening move.</p>
+            <p className="ai-waiting-cta">Tap anywhere to begin</p>
+          </div>
+        </div>
+      )}
       {showModal && winner && (
         <GameOverModal
           winner={winner}
