@@ -642,8 +642,8 @@ export const useGameState = (
     const blackScore = calculateScore(initialBoard, 'black');
 
     setGameState(prev => {
-      // Use the current aiLevel from game state, not from settings
-      const aiLevel = prev.aiLevel;
+      // Always reset AI level to the current difficulty setting (not carry over from last game)
+      const aiLevel = getAILevelFromDifficulty(settings.difficulty);
       // AI moves first only in advanced mode when setting is enabled
       const aiMovesFirst = aiLevel === 'advanced' && settings.aiMovesFirst;
 
@@ -669,7 +669,7 @@ export const useGameState = (
     });
     setMultiJumpSource(null);
     setToastMessage(null);
-  }, [settings.aiMovesFirst]);
+  }, [settings.aiMovesFirst, settings.difficulty]);
 
   const clearUndoHighlight = useCallback(() => {
     setGameState(prev => ({
