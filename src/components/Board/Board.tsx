@@ -410,7 +410,7 @@ export const Board: React.FC<BoardProps> = ({ gameState, onTileClick, onMovePiec
             <div className="ai-waiting-icon">🤖</div>
             <p className="ai-waiting-title">AI goes first!</p>
             <p className="ai-waiting-msg">The AI is ready — but it will wait for you.</p>
-            <p className="ai-waiting-hint">Tip: set your board &amp; checker colors now using the sidebar tabs, then come back and tap to start.</p>
+            <p className="ai-waiting-hint">Tip: set your board &amp; checker colors now using the sidebar tabs, then come back and tap to start. For the best playing experience, we recommend clicking the <strong>Stats</strong> tab before starting the game.</p>
             <p className="ai-waiting-cta">Tap anywhere to begin</p>
           </div>
         </div>
