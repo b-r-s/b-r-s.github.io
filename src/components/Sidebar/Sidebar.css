@@ -390,9 +390,6 @@ button.game-button.new-game-btn {
   align-items: center;
   gap: 0.3rem;
 }
-  align-items: center;
-  gap: 0.25rem;
-}
 
 /* ⓘ info button */
 .tip-info-btn {
