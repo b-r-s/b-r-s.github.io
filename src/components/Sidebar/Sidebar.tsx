@@ -235,7 +235,7 @@ export function Sidebar({
                 style={{ top: tipToastPos.top, right: tipToastPos.right }}
               >
                 Checkers4Pi is free to play, always. If you enjoy the challenge, consider sending a small tip—your support helps us maintain the game and grow the Pi ecosystem! 🙏
-                <span className="tip-info-cta">Choose an amount: <strong>0.1π</strong>, <strong>0.5π</strong>, or <strong>1π</strong>.</span>
+                <span className="tip-info-cta">Choose a PI tip amount: <strong>0.1 Pi</strong>, <strong>0.5 Pi</strong>, or <strong>1.0 Pi</strong>.</span>
               </div>
             )}
           </div>
