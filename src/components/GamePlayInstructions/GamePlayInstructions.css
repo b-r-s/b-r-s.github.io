@@ -20,6 +20,22 @@
   overflow-y: visible;
 }
 
+/* Device / orientation notice callout */
+.gameplay-instruction-item.device-notice {
+  background: rgba(255, 200, 40, 0.08);
+  border-left: 3px solid rgba(255, 200, 40, 0.7);
+  border-radius: 0.25rem;
+  padding: 0.6rem 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.gameplay-instruction-item.device-notice strong {
+  color: rgba(255, 210, 60, 0.95);
+  font-size: 0.85rem;
+  display: block;
+  margin-bottom: 0.35rem;
+}
+
 .gameplay-instructions-container h2 {
   text-align: center;
   margin: 0 0 15px 0;

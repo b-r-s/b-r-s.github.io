@@ -12,6 +12,19 @@ export const GamePlayInstructions: React.FC<GamePlayInstructionsProps> = ({ onBa
 
     <div className="gameplay-instructions-list">
 
+      {/* ── DEVICE & ORIENTATION NOTICE ── */}
+      <div className="gameplay-instruction-item device-notice">
+        <strong>📱 Mobile Portrait Mode Only</strong>
+        <p className="instruction-paragraph">
+          Checkers4Pi has been designed specifically for <strong>mobile phones and tablets</strong>.
+          For the best experience, keep your device in <strong>portrait (upright) mode</strong>.
+        </p>
+        <p className="instruction-paragraph">
+          If you rotate your device to landscape, the game will display a reminder to flip back —
+          just turn it upright again and you're good to go.
+        </p>
+      </div>
+
       {/* ── GETTING STARTED ── */}
       <div className="gameplay-instruction-item">
         <strong>Getting Started</strong>
