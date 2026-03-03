@@ -358,11 +358,18 @@ button.game-button.new-game-btn {
   gap: 0.4rem;
 }
 
-/* Tip ($) button */
+/* Tip button wrapper */
 .tip-btn-wrapper {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
+}
+
+/* Three-amount tip button group */
+.tip-amount-btns {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 /* ⓘ info button */

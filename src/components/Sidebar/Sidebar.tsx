@@ -209,18 +209,23 @@ export function Sidebar({
                 >
                   ⓘ
                 </button>
-                <button
-                  className="tip-btn"
-                  onClick={() => {
-                    hideTipToast();
-                    fetch('/api/health').catch(() => {});
-                    resetPaymentStatus?.();
-                    createPayment(0.5, 'Tip for Checkers4Pi — Thank you!');
-                  }}
-                  aria-label="Send a 0.5 π tip"
-                >
-                  $
-                </button>
+                <div className="tip-amount-btns">
+                  {([0.1, 0.5, 1] as const).map((amt) => (
+                    <button
+                      key={amt}
+                      className="tip-btn"
+                      onClick={() => {
+                        hideTipToast();
+                        fetch('/api/health').catch(() => {});
+                        resetPaymentStatus?.();
+                        createPayment(amt, `Tip for Checkers4Pi — Thank you!`);
+                      }}
+                      aria-label={`Send a ${amt}π tip`}
+                    >
+                      {amt}π
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
             {tipToastVisible && tipToastPos && (
@@ -229,8 +234,8 @@ export function Sidebar({
                 role="tooltip"
                 style={{ top: tipToastPos.top, right: tipToastPos.right }}
               >
-                Checkers4Pi is free, always. If you enjoy it, send a small tip in Test Pi — it costs you nothing real and helps confirm Pi ecosystem connectivity. 🙏
-                <span className="tip-info-cta">Tap <strong>$</strong> to send 0.5π.</span>
+                Checkers4Pi is free to play, always. If you enjoy the challenge, consider sending a small tip—your support helps us maintain the game and grow the Pi ecosystem! 🙏
+                <span className="tip-info-cta">Choose an amount: <strong>0.1π</strong>, <strong>0.5π</strong>, or <strong>1π</strong>.</span>
               </div>
             )}
           </div>
