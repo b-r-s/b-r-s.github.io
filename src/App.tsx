@@ -218,6 +218,10 @@ function App() {
         )
       ) : (
         <div className="game-layout">
+          <div className="pi-username-banner">
+            <span>Pi Network</span>
+            <span className="pi-username-handle">@brs4040</span>
+          </div>
           <div className="main-content">
             <Board
               gameState={gameState}
