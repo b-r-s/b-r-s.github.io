@@ -18,7 +18,7 @@ export const GamePlayInstructions: React.FC<GamePlayInstructionsProps> = ({ onBa
         <p className="instruction-paragraph">
           Capture all of your opponent's pieces, or block them so they cannot move.
           You play as Red (colour is customisable) and the AI plays as Black.
-          Red always moves first. Play is on the dark squares of an 8×8 board.
+          Red always moves first (unless the AI in advanced mode and is set to move first). Play is on the dark squares of an 8×8 board.
         </p>
       </div>
 
@@ -36,8 +36,8 @@ export const GamePlayInstructions: React.FC<GamePlayInstructionsProps> = ({ onBa
       <div className="gameplay-instruction-item">
         <strong>Mandatory Capturing</strong>
         <p className="instruction-paragraph">
-          If a jump is available you <em>must</em> take it. The jumped piece is removed.
-          If further jumps are possible with the same piece after landing, you must keep jumping
+          If a jump is available you <em>MUST</em> take it. The jumped piece is removed.
+          If further jumps are possible with the same piece after landing, you <em>MUST</em> keep jumping
           until no more captures are available (multi-jump).
         </p>
       </div>
@@ -47,14 +47,15 @@ export const GamePlayInstructions: React.FC<GamePlayInstructionsProps> = ({ onBa
         <strong>Difficulty Levels</strong>
         <p className="instruction-paragraph">
           Choose your level on the <em>AI</em> tab before the game starts.
-          Settings are locked once the first move is made.
+          AI settings are locked once the first move is made.
         </p>
 
         <div className="level-block level-beginner">
           <span className="level-badge">🟢 Beginner</span>
           <ul className="level-details">
             <li>AI makes simplified, mostly random moves.</li>
-            <li><span className="feature-on">✔ Undo Move</span> — reverses your last move <em>and</em> the AI's reply.</li>
+            <li><span className="feature-on">✔ Undo Move</span> — reverses your last move <em>and</em> the AI's reply.
+            You may undo back to the start of the game.</li>
             <li><span className="feature-off">✘ AI Moves First</span> — not available at this level.</li>
           </ul>
         </div>
@@ -84,7 +85,7 @@ export const GamePlayInstructions: React.FC<GamePlayInstructionsProps> = ({ onBa
         <strong>Game Controls</strong>
         <ul className="level-details">
           <li><strong>New Game</strong> — restarts immediately. If <em>Lock AI Level</em> is on your chosen difficulty carries over; otherwise the level resets to Intermediate.</li>
-          <li><strong>Lock AI Level</strong> (AI tab) — when checked, your selected difficulty is remembered across new games. Enabled by default.</li>
+          <li><strong>Lock AI Level</strong> (AI tab) — when checked, your selected difficulty is remembered across new games for the current session. Enabled by default.</li>
           <li><strong>⏸ Pause</strong> (Stats tab) — stops the clock and blocks input. Disabled during the AI's turn.</li>
           <li><strong>Undo Move</strong> — Beginner only. Appears when at least one full round (your move + AI reply) has been played.</li>
         </ul>
