@@ -145,16 +145,34 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.4rem;
   margin-bottom: 0.3rem;
 }
 
 .player-name {
   font-weight: 700;
-  font-size:  1rem;
+  font-size: 1rem;
   color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 0.3rem;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Truncate name text, keep color dot and pulse icon fixed */
+.player-name .text-red,
+.player-name .text-black {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.ai-difficulty-label {
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .sidebar-stat-breakdown {
@@ -356,18 +374,22 @@ button.game-button.new-game-btn {
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  flex-shrink: 0;
 }
 
 /* Tip button wrapper */
 .tip-btn-wrapper {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.55rem;
 }
 
 /* Three-amount tip button group */
 .tip-amount-btns {
   display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
   align-items: center;
   gap: 0.25rem;
 }
@@ -703,6 +725,7 @@ button.game-button.new-game-btn {
   height: 25px;
   border-radius: 50%;
   margin-right: 8px;
+  flex-shrink: 0;
 }
 
 /* Board color picker — 2-column compact grid */
