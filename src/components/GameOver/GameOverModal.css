@@ -17,8 +17,9 @@
 }
 
 .game-over-content {
+  --human-win-color: var(--text-primary);
   background-color: #2d1b4e;
-  padding: 1.25rem 2rem;
+  padding: 1.5rem 1.7rem 1.8rem;
   border-radius: 12px;
   border: 2px solid var(--sunlight-gold);
   text-align: center;
@@ -26,59 +27,76 @@
   transform: scale(1);
   color: var(--text-primary);
   animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  max-width: 85vw;
+  max-width: 88vw;
+  max-height: 92vh;
+  min-height: 62vh;
+  overflow-y: auto;
+}
+
+.game-over-winner-panel {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 2px solid rgba(249, 115, 22, 0.7);
+  padding: 0.7rem 0.85rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.winner-color-badge {
+  color: var(--human-win-color);
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.winner-king-image {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
 }
 
 .game-over-title {
-  font-size: 2rem;
-  margin-bottom: 0.75rem;
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
+  font-size: 1.45rem;
+  margin-bottom: 0;
+  color: var(--human-win-color);
   font-weight: 800;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.game-over-title.red {
-  background-image: linear-gradient(to right, #ef4444, #ff8c00);
-}
-
-.game-over-title.black {
-  background-image: linear-gradient(to right, #9ca3af, #e5e7eb);
-}
-
-.game-over-title.draw {
-  background-image: linear-gradient(to right, #fbbf24, #d97706);
+  text-shadow: none;
 }
 
 .game-over-message {
-  color: var(--text-primary);
-  margin-bottom: 1.25rem;
+  color: var(--human-win-color);
+  margin: 0.7rem 0 1.25rem;
   font-size: 0.9rem;
 }
 
 .gameover-stats-breakdown {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-  margin: 1.5rem 0 0 0;
-  overflow-x: auto;
+  gap: 1rem;
+  margin: 1.35rem 0 0 0;
+}
+
+.gameover-player-block {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.45rem;
 }
 
 .gameover-stats-row {
   display: grid;
-  grid-template-columns: minmax(120px, 1.35fr) repeat(4, minmax(56px, 1fr));
+  grid-template-columns: repeat(4, minmax(52px, 1fr));
   align-items: end;
   gap: 0.4rem;
-  min-width: 420px;
 }
 
 .gameover-stats-player-label {
   font-weight: bold;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   text-align: left;
-  padding-right: 0.25rem;
-  color: var(--accent-dark);
+  padding-left: 0.15rem;
+  color: var(--text-primary);
   white-space: nowrap;
 }
 
@@ -114,7 +132,7 @@
   font-weight: 600;
   background-color: var(--bg-dark);
   color: var(--text-primary);
-  border: none;
+  border: 2px solid var(--border-medium);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
@@ -160,10 +178,20 @@
   .game-over-content {
     padding: 1.5rem 2.5rem;
     max-width: 90vw;
+    min-height: 0;
   }
 
   .game-over-title {
-    font-size: 2.5rem;
+    font-size: 1.85rem;
+  }
+
+  .winner-color-badge {
+    font-size: 1.8rem;
+  }
+
+  .winner-king-image {
+    width: 46px;
+    height: 46px;
   }
 
   .game-over-message {
@@ -172,9 +200,8 @@
   }
 
   .gameover-stats-row {
-    grid-template-columns: minmax(140px, 1.25fr) repeat(4, minmax(68px, 1fr));
+    grid-template-columns: repeat(4, minmax(68px, 1fr));
     gap: 0.6rem;
-    min-width: 0;
   }
 
   .gameover-stats-player-label {
@@ -220,10 +247,11 @@
   .game-over-content {
     padding: 2rem 4rem;
     max-width: none;
+    max-height: 90vh;
   }
 
   .game-over-title {
-    font-size: 3rem;
+    font-size: 2.1rem;
   }
 
   .game-over-message {
@@ -232,7 +260,7 @@
   }
 
   .gameover-stats-row {
-    grid-template-columns: minmax(170px, 1.1fr) repeat(4, minmax(88px, 1fr));
+    grid-template-columns: repeat(4, minmax(88px, 1fr));
     gap: 0.9rem;
   }
 
