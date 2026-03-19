@@ -41,10 +41,17 @@ const STAT_KEYS: StatKey[] = ['material', 'power', 'strategy', 'total'];
 
 export const GameOverModal: React.FC<GameOverModalProps> = ({ winner, scores, playerColor, onNewGame, onExit }) => {
   const isRedWin = winner === 'red';
+  const humanColorLabel = COLOR_THEME_LABELS[playerColor];
+
+  const winnerLabel = winner === 'red'
+    ? `${humanColorLabel} (You)`
+    : winner === 'black'
+      ? 'Black (AI)'
+      : 'Draw';
 
   const getMessage = () => {
     switch (winner) {
-      case 'red': return 'Red Wins! 🎉';
+      case 'red': return `${humanColorLabel} Wins! 🎉`;
       case 'black': return 'Black Wins!';
       case 'draw': return 'Game Drawn!';
       default: return 'Game Over';
@@ -60,12 +67,12 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({ winner, scores, pl
         <div className="game-over-content">
           <h2 className={`game-over-title ${titleClass}`}>{getMessage()}</h2>
           <p className="game-over-message">
-            {winner === 'draw' ? 'No more moves possible.' : `Congratulations ${winner}!`}
+            {winner === 'draw' ? 'No more moves possible.' : `Congratulations ${winnerLabel}!`}
           </p>
           <div className="gameover-stats-breakdown">
             <div className="gameover-stats-row">
               <div className="gameover-stats-player-label">
-                {COLOR_THEME_LABELS[playerColor]} (You)
+                {humanColorLabel} (You)
               </div>
               {STAT_KEYS.map((key) => (
                 <div className="gameover-stat tooltip-container" key={key}>
