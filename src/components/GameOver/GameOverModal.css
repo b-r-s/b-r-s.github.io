@@ -14,12 +14,6 @@
   z-index: 1000;
   backdrop-filter: blur(4px);
   animation: fadeIn 0.3s ease-out;
-  transition: opacity 0.5s ease-out;
-}
-
-.game-over-overlay.fade-out {
-  opacity: 0;
-  pointer-events: none;
 }
 
 .game-over-content {
@@ -129,6 +123,35 @@
   min-height: 44px;
 }
 
+.game-over-actions {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.exit-game-btn {
+  padding: 0.6rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  background-color: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--accent-medium);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 44px;
+  width: 100%;
+  white-space: normal;
+  line-height: 1.2;
+}
+
+.play-again-btn {
+  width: 100%;
+}
+
 /* ==========================================================================
    Medium Screens (Tablets, 768px+)
    ========================================================================== */
@@ -165,9 +188,22 @@
     font-size: 1.2rem;
   }
 
+  .game-over-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
   .play-again-btn {
     padding: 0.65rem 1.75rem;
     font-size: 1.1rem;
+    width: auto;
+  }
+
+  .exit-game-btn {
+    padding: 0.65rem 1.75rem;
+    font-size: 1.1rem;
+    width: auto;
   }
 }
 
@@ -206,6 +242,11 @@
     padding: 0.75rem 2rem;
     font-size: 1.2rem;
   }
+
+  .exit-game-btn {
+    padding: 0.75rem 2rem;
+    font-size: 1.2rem;
+  }
 }
 
 /* Utility & Specialty Queries */
@@ -216,6 +257,11 @@
     filter: brightness(1.1);
     transform: translateY(-2px);
     box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.3);
+  }
+
+  .exit-game-btn:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
   }
 
   .tooltip-container:hover .sidebar-tooltip {
@@ -231,7 +277,16 @@
     min-width: 120px;
   }
 
+  .exit-game-btn {
+    min-height: 48px;
+    min-width: 160px;
+  }
+
   .play-again-btn:active {
+    transform: scale(0.95);
+  }
+
+  .exit-game-btn:active {
     transform: scale(0.95);
   }
 }

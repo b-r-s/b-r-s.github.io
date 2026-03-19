@@ -95,6 +95,20 @@ function App() {
     restartGame();
   };
 
+  const handleExitToPiBrowser = useCallback(() => {
+    if (window.history.length > 1) {
+      window.history.back();
+      return;
+    }
+
+    if (document.referrer) {
+      window.location.href = document.referrer;
+      return;
+    }
+
+    window.location.href = 'https://minepi.com';
+  }, []);
+
   const handleStartGame = () => {
     setShowSplash(false);
   };
@@ -124,6 +138,10 @@ function App() {
       setHumanReady(!needsOverlay);
     }
   }, [gameState.moveCount, settings.aiMovesFirst, gameState.aiLevel]);
+
+  useEffect(() => {
+    setShowPlayAgain(Boolean(gameState.winner));
+  }, [gameState.winner]);
 
   // Apply board colors as CSS variables
   useEffect(() => {
@@ -228,10 +246,10 @@ function App() {
               onTileClick={handleTileClickWithPause}
               onMovePiece={movePiece}
               onRestart={handleRestart}
+              onExit={handleExitToPiBrowser}
               onClearUndoHighlight={clearUndoHighlight}
               toastMessage={toastMessage}
               playerColor={settings.playerColor}
-              onModalFadeComplete={() => setShowPlayAgain(true)}
               awaitingPlayerReady={!humanReady}
               onPlayerReady={() => setHumanReady(true)}
             />

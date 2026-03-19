@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { FallingEmojis } from './FallingEmojis';
 import './GameOverModal.css';
 
@@ -12,7 +12,8 @@ interface GameOverModalProps {
   winner: 'red' | 'black' | 'draw';
   scores: GameScores;
   playerColor: PlayerColorTheme;
-  onFadeComplete?: () => void;
+  onNewGame: () => void;
+  onExit: () => void;
 }
 
 
@@ -38,26 +39,8 @@ const STAT_LABELS = {
 type StatKey = keyof typeof STAT_LABELS;
 const STAT_KEYS: StatKey[] = ['material', 'power', 'strategy', 'total'];
 
-export const GameOverModal: React.FC<GameOverModalProps> = ({ winner, scores, playerColor, onFadeComplete }) => {
+export const GameOverModal: React.FC<GameOverModalProps> = ({ winner, scores, playerColor, onNewGame, onExit }) => {
   const isRedWin = winner === 'red';
-  const [isVisible, setIsVisible] = useState(true);
-
-  useEffect(() => {
-    // Start fading out after 2 seconds
-    const fadeTimer = setTimeout(() => {
-      setIsVisible(false);
-    }, 2000);
-
-    // Notify parent when fade is complete (2s + 500ms fade animation)
-    const completeTimer = setTimeout(() => {
-      onFadeComplete?.();
-    }, 2500);
-
-    return () => {
-      clearTimeout(fadeTimer);
-      clearTimeout(completeTimer);
-    };
-  }, [onFadeComplete]);
 
   const getMessage = () => {
     switch (winner) {
@@ -73,7 +56,7 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({ winner, scores, pl
   return (
     <>
       {isRedWin && <FallingEmojis />}
-      <div className={`game-over-overlay ${!isVisible ? 'fade-out' : ''}`}>
+      <div className="game-over-overlay">
         <div className="game-over-content">
           <h2 className={`game-over-title ${titleClass}`}>{getMessage()}</h2>
           <p className="game-over-message">
@@ -104,6 +87,14 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({ winner, scores, pl
                 </div>
               ))}
             </div>
+          </div>
+          <div className="game-over-actions">
+            <button className="play-again-btn" onClick={onNewGame}>
+              New Game
+            </button>
+            <button className="exit-game-btn" onClick={onExit}>
+              Exit to Pi Browser
+            </button>
           </div>
         </div>
       </div>

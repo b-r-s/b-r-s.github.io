@@ -1,8 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import './Board.css';
 import { CheckerPieceMemo as CheckerPiece } from '../CheckerPiece';
 import { getValidMovesForPiece, getAllValidMoves } from '../../utils/gameLogic';
-import type { GameState, PlayerColorTheme } from '../../types/game';
+import type { GameState, Move, PlayerColorTheme } from '../../types/game';
 import { GameOverModal } from '../GameOver/GameOverModal';
 import { AdvantageBar } from '../AdvantageBar';
 import { BattleEffects } from '../BattleEffects/BattleEffects';
@@ -13,23 +13,28 @@ export interface BoardProps {
   onTileClick: (row: number, col: number) => void;
   onMovePiece: (from: { row: number; col: number }, to: { row: number; col: number }) => void;
   onRestart: () => void;
+  onExit: () => void;
   onClearUndoHighlight: () => void;
   toastMessage: string | null;
   playerColor: PlayerColorTheme;
-  onModalFadeComplete?: () => void;
   awaitingPlayerReady?: boolean;
   onPlayerReady?: () => void;
 }
 
-export const Board: React.FC<BoardProps> = ({ gameState, onTileClick, onMovePiece, onClearUndoHighlight, toastMessage, playerColor, onModalFadeComplete, awaitingPlayerReady, onPlayerReady }) => {
+export const Board: React.FC<BoardProps> = ({ gameState, onTileClick, onMovePiece, onRestart, onExit, onClearUndoHighlight, toastMessage, playerColor, awaitingPlayerReady, onPlayerReady }) => {
   const { board, selectedPosition, validMoves, lastAIMove, lastUndoMove, winner } = gameState;
   const [draggingPos, setDraggingPos] = useState<{ row: number; col: number } | null>(null);
   const [hoveredSquare, setHoveredSquare] = useState<{ row: number; col: number } | null>(null);
   const [pieceHovered, setPieceHovered] = useState<{ row: number; col: number } | null>(null);
-  const [hoverValidMoves, setHoverValidMoves] = useState<any[]>([]);
+  const [hoverValidMoves, setHoverValidMoves] = useState<Move[]>([]);
   const [touchStartPos, setTouchStartPos] = useState<{ x: number; y: number } | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [activeEffects, setActiveEffects] = useState<BattleEffectsProps[]>([]);
+
+  const removeFromActiveEffects = useCallback(() => {
+    // Keep the active effects queue bounded as effects complete.
+    setActiveEffects(prev => prev.slice(1));
+  }, []);
 
   // Show modal when game ends
   React.useEffect(() => {
@@ -81,13 +86,7 @@ export const Board: React.FC<BoardProps> = ({ gameState, onTileClick, onMovePiec
         setActiveEffects(prev => [...prev, ...newEffects]);
       }
     }
-  }, [gameState.lastHumanMove]);
-
-  const removeFromActiveEffects = () => {
-    // Logic to remove effect from state to avoid memory leaks/clutter
-    // Since function equality might be tricky, maybe just don't worry about strict identification for now or use timestamp
-    setActiveEffects(prev => prev.slice(1)); // Simple FIFO removal or similar
-  };
+  }, [gameState.lastHumanMove, removeFromActiveEffects]);
 
   // Performance optimization: create a Set for O(1) lookup instead of O(n) array.some()
   const validMoveMap = useMemo(() => {
@@ -420,10 +419,8 @@ export const Board: React.FC<BoardProps> = ({ gameState, onTileClick, onMovePiec
           winner={winner}
           scores={gameState.scores}
           playerColor={playerColor}
-          onFadeComplete={() => {
-            setShowModal(false);
-            onModalFadeComplete?.();
-          }}
+          onNewGame={onRestart}
+          onExit={onExit}
         />
       )}
       <div className="board-with-advantage">
