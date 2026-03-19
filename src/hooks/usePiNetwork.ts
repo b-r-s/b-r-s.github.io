@@ -23,6 +23,13 @@ const getPi = () => {
   return (window as any).Pi ?? null;
 };
 
+const buildPaymentsUrl = (apiBase: string, action: 'approve' | 'complete') => {
+  const base = (apiBase ?? '').trim().replace(/\/+$/, '');
+  if (!base) return `/api/payments/${action}`;
+  if (base.endsWith('/api')) return `${base}/payments/${action}`;
+  return `${base}/api/payments/${action}`;
+};
+
 export const usePiNetwork = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<PiUser | null>(null);
@@ -69,7 +76,7 @@ export const usePiNetwork = () => {
     // Store in localStorage immediately — survives page reload if beacon fails
     try { localStorage.setItem('pi_pending_approval', JSON.stringify({ paymentId, apiBase, ts: Date.now() })); } catch (_) {}
 
-    const url = `${apiBase}/api/payments/approve`;
+    const url = buildPaymentsUrl(apiBase, 'approve');
     const body = JSON.stringify({ paymentId });
 
     // sendBeacon fires even when the page is frozen/navigating away
@@ -95,7 +102,7 @@ export const usePiNetwork = () => {
         if (age < 55000) { // still within Pi's 60s window
           addLog(`Retrying pending approval from ${Math.round(age/1000)}s ago: ${paymentId.slice(0,10)}...`);
           localStorage.removeItem('pi_pending_approval');
-          fetch(`${apiBase}/api/payments/approve`, {
+          fetch(buildPaymentsUrl(apiBase, 'approve'), {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ paymentId }),
           }).then(async r => {
@@ -137,7 +144,7 @@ export const usePiNetwork = () => {
         const paymentId = incompletePayment?.identifier;
         if (paymentId) {
           console.log('[Pi] Incomplete payment on auth, approving:', paymentId);
-          fetch(`${apiBase}/api/payments/approve`, {
+          fetch(buildPaymentsUrl(apiBase, 'approve'), {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ paymentId }),
           }).catch(() => {});
@@ -233,13 +240,18 @@ export const usePiNetwork = () => {
           authPromiseRef.current ?? Promise.resolve(null),
           timeoutPromise,
         ]);
-        if (result?.user || result?.accessToken) {
+        if (result?.user || result?.accessToken || isAuthenticated) {
           addLog('Auth OK');
           // isAuthenticated state may not have updated yet — continue anyway since result is valid
         } else {
-          addLog('Auth returned no user — aborting');
-          setPaymentStatus('error');
-          return;
+          addLog('Auth not ready from mount — trying direct auth now');
+          const freshAuth = await authenticate();
+          if (!(freshAuth?.user || freshAuth?.accessToken || isAuthenticated)) {
+            addLog('Direct auth returned no user — aborting');
+            setPaymentStatus('error');
+            return;
+          }
+          addLog('Direct auth OK');
         }
       } catch (e) {
         let errMsg = (typeof e === 'object' && e && 'message' in e) ? (e as any).message : String(e);
@@ -258,7 +270,7 @@ export const usePiNetwork = () => {
     // the 60-second approval window that Pi gives us.
     // Ping the approve route specifically (not just health) to warm the exact code path.
     try {
-      await fetch(`${apiBase}/api/payments/approve`, {
+      await fetch(buildPaymentsUrl(apiBase, 'approve'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId: '__warmup__' }),
@@ -278,7 +290,7 @@ export const usePiNetwork = () => {
           },
           onReadyForServerCompletion: (paymentId: string, txid: string) => {
             addLog(`onReadyForServerCompletion txid: ${txid}`);
-            fetch(`${apiBase}/api/payments/complete`, {
+            fetch(buildPaymentsUrl(apiBase, 'complete'), {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ paymentId, txid }),
