@@ -1,6 +1,7 @@
 /* GamePlayInstructions - Mobile First */
 
 .gameplay-instructions-container {
+  --instructions-pad: 0.55rem;
   border: 2px solid var(--border-dark);
   border-radius: var(--radius-lg);
   background-color: var(--bg-medium);
@@ -8,14 +9,14 @@
   font-family: inherit;
   width: 90%;
   max-width: 600px;
-  max-height: 80dvh;
+  max-height: 95dvh;
   margin: auto;
-  margin-top: 5vh;
+  margin-top: 1vh;
   /* Reduced base for mobile */
-  margin-bottom: 5vh;
+  margin-bottom: 1vh;
   display: flex;
   flex-direction: column;
-  padding: 0.75rem;
+  padding: 0.3rem var(--instructions-pad) 0.45rem;
   box-sizing: border-box;
   overflow-y: visible;
 }
@@ -23,10 +24,11 @@
 /* Device / orientation notice callout */
 .gameplay-instruction-item.device-notice {
   background: rgba(255, 200, 40, 0.08);
+  border: 1px solid rgba(255, 200, 40, 0.42);
   border-left: 3px solid rgba(255, 200, 40, 0.7);
   border-radius: 0.25rem;
-  padding: 0.6rem 0.75rem;
-  margin-bottom: 0.5rem;
+  padding: 0.55rem 0.7rem;
+  margin-bottom: 0.35rem;
 }
 
 .gameplay-instruction-item.device-notice strong {
@@ -38,12 +40,32 @@
 
 .gameplay-instructions-container h2 {
   text-align: center;
-  margin: 0 0 15px 0;
-  font-size: 1.25rem;
+  margin: 0 0 6px 0;
+  font-size: 1.2rem;
   /* Smaller base */
   font-weight: 700;
+  line-height: 1.05;
   flex-shrink: 0;
   color: inherit;
+}
+
+.instructions-section-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0 0 0.35rem;
+}
+
+.instructions-control-btn {
+  flex: 1;
+  border: 1px solid var(--border-medium);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.35rem 0.45rem;
+  min-height: 34px;
+  cursor: pointer;
 }
 
 .gameplay-instructions-list {
@@ -57,7 +79,7 @@
   min-height: 0;
   /* Critical for flex scroll */
   overflow-y: auto;
-  padding-right: 0.5rem;
+  padding-right: 0.35rem;
   scrollbar-width: thin;
   scrollbar-color: #888 #555;
 }
@@ -86,6 +108,48 @@
   line-height: 1.4;
 }
 
+.gameplay-section {
+  margin-bottom: 0.65rem;
+  border: 1px solid var(--border-medium);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+.gameplay-section-summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 0.6rem 0.72rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--accent-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  user-select: none;
+}
+
+.gameplay-section-summary::-webkit-details-marker {
+  display: none;
+}
+
+.gameplay-section-summary::after {
+  content: '▾';
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  transition: transform 0.2s ease;
+}
+
+.gameplay-section[open] .gameplay-section-summary::after {
+  transform: rotate(180deg);
+}
+
+.gameplay-section-content {
+  padding: 0 0.72rem 0.12rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
 .gameplay-instruction-item:first-child {
   padding-top: 10px;
 }
@@ -100,9 +164,11 @@
 
 .instructions-actions {
   text-align: center;
-  margin-top: 1rem;
+  margin-top: auto;
   flex-shrink: 0;
-  padding-top: 1rem;
+  padding: 0.45rem var(--instructions-pad) 0;
+  margin-left: calc(var(--instructions-pad) * -1);
+  margin-right: calc(var(--instructions-pad) * -1);
   border-top: 1px solid var(--border-medium);
 }
 
@@ -110,9 +176,9 @@
   background: var(--btn-primary);
   color: var(--text-light);
   border: 2px solid var(--btn-border);
-  padding: 10px 20px;
+  padding: 8px 16px;
   border-radius: 8px;
-  font-size: 1.1rem;
+  font-size: 1rem;
   /* Smaller base */
   cursor: pointer;
   font-weight: bold;
@@ -148,18 +214,38 @@
 
 @media (min-width: 768px) {
   .gameplay-instructions-container {
-    padding: 2rem;
+    --instructions-pad: 2rem;
+    padding: 0.8rem var(--instructions-pad) 1rem;
     width: 80%;
-    margin-top: 10vh;
-    margin-bottom: 10vh;
+    margin-top: 4vh;
+    margin-bottom: 4vh;
+    max-height: 90dvh;
   }
 
   .gameplay-instructions-container h2 {
     font-size: 1.5rem;
   }
 
+  .instructions-section-controls {
+    margin-bottom: 0.9rem;
+  }
+
+  .instructions-control-btn {
+    font-size: 0.9rem;
+    min-height: 40px;
+  }
+
   .gameplay-instruction-item {
     font-size: 1rem;
+  }
+
+  .gameplay-section-summary {
+    font-size: 1rem;
+    padding: 0.8rem 0.95rem;
+  }
+
+  .gameplay-section-content {
+    padding: 0 0.95rem 0.35rem;
   }
 
   .gameplay-instruction-item strong {
@@ -176,6 +262,10 @@
 }
 
 @media (hover: hover) {
+  .instructions-control-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
   .back-btn:hover {
     transform: scale(1.05);
     background: var(--accent-light);
