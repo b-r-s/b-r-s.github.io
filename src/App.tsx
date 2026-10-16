@@ -33,25 +33,6 @@ function App() {
   //  http://localhost:5174/?previewAuth=failed 
 
   
-/* temp for testing  */
-// import { usePiNetwork } from './hooks/usePiNetwork';
-
-// Then, wherever your component starts:
-const { isAuthenticated, user } = usePiNetwork();
-
-// Paste this right inside your return statement so it renders on screen:
-<div style={{ 
-        background: 'black', color: 'lime', padding: '10px', 
-        position: 'absolute', top: 0, left: 0, right: 0, zIndex: 9999, fontSize: '14px' 
-      }}>
-        <div>SDK Present: {typeof window !== 'undefined' && 'Pi' in window ? 'YES' : 'NO'}</div>
-        <div>Is Auth: {isAuthenticated ? 'YES' : 'NO'}</div>
-        <div>User: {user?.username || 'None'}</div>
-      </div>
-/* end of test  */
-
-
-
   const previewAuth = (() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);

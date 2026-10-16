@@ -11,6 +11,7 @@ interface SplashScreenProps {
 
 export function SplashScreen({ onStart, onShowInstructions }: SplashScreenProps) {
   return (
+  
     <div className="splash-wrapper">
       <div className="splash-container">
         <div className="image-wrapper">
