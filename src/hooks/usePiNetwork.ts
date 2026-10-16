@@ -129,7 +129,7 @@ export const usePiNetwork = () => {
     const Pi = getPi();
     if (!Pi) return;
     try {
-      Pi.init({ version: '2.0', sandbox: false }); // false = production / externally-hosted app
+      Pi.init({ version: '2.0', sandbox: true }); // false = production / externally-hosted app
       console.log('[Pi] SDK init OK (sandbox: false)');
     } catch (e) {
       console.warn('[Pi] SDK init error:', e);
