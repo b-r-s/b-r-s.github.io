@@ -26,6 +26,7 @@ const LandscapeWarning = ({ logo }: { logo: string }) => (
 );
 
 function App() {
+  const { isAuthenticated, user } = usePiNetwork();
   // DEV-ONLY: Preview authentication screens for styling
   // To use: add ?previewAuth=checking or ?previewAuth=failed to your local URL
   // 'checking' shows the loading/auth screen, 'failed' shows the error/failure screen
@@ -57,20 +58,26 @@ function App() {
   const { authenticate, createPayment, paymentStatus, resetPaymentStatus } = usePiNetwork();
   const [authChecked, setAuthChecked] = useState(false);
 
-  useEffect(() => {
-    // Auth never blocks the game — Pi auth is only required for the tip/payment
-    // feature, not to play. Always resolve to the game regardless of outcome.
+useEffect(() => {
     if (typeof window !== 'undefined' && 'Pi' in window) {
-      const authTimeout = new Promise<void>(resolve =>
-        setTimeout(() => {
-          console.warn('Pi auth timed out after 20s — proceeding to game.');
-          resolve();
-        }, 20000)
+      const authTimeout = new Promise<void>((_, reject) =>
+        setTimeout(() => reject(new Error('Pi auth timed out after 20s')), 20000)
       );
       Promise.race([authenticate(), authTimeout])
-        .finally(() => setAuthChecked(true));
+        .then(() => {
+          setAuthChecked(true);
+        })
+        .catch((err) => {
+          console.error('Authentication required to play:', err);
+          try {
+            localStorage.setItem('pi_auth_error', err?.message || 'Authentication failed');
+          } catch (storageErr) {
+            console.error('Could not save error to local storage', storageErr);
+          }
+          setAuthChecked(true); // Resolves to the Error screen state
+        });
     } else {
-      // No Pi SDK (dev environment or non-Pi browser) — go straight to game
+      // No Pi SDK detected (dev/desktop browser)
       setAuthChecked(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -182,7 +189,9 @@ function App() {
       }
       const log = localStorage.getItem('pi_debug_log');
       if (log) debugLogLines = JSON.parse(log);
-    } catch (_) {}
+    } catch (noLog) {
+        console.error('Could not open the debug log', noLog);
+    }
   }
   const isCheckingPreview = previewAuth === 'checking';
 
@@ -221,6 +230,26 @@ function App() {
     );
   }
 
+  const isPiBrowser = typeof window !== 'undefined' && 'Pi' in window;
+  if (authChecked && isPiBrowser && !isAuthenticated && !previewAuth) {
+    return (
+      <div className="app-container error">
+        <LandscapeWarning logo={logo} />
+        <div className="auth-error-content">
+          <img src={logo} alt="Checkers4Pi" className="error-logo" />
+          <h1>Authentication Required</h1>
+          <p className="error-detail">
+            You must authorize with your Pi Account to play Checkers4Pi.
+          </p>
+          <button className="welcome-button" onClick={() => window.location.reload()}>
+            Retry Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+  
+
   // 3. Main Application Flow (Splash -> Game)
   return (
     <div className="app-container">
@@ -234,9 +263,9 @@ function App() {
         )
       ) : (
         <div className="game-layout">
-          <div className="pi-username-banner">
+         <div className="pi-username-banner">
             <span>Pi Network</span>
-            <span className="pi-username-handle">@brs4040</span>
+            <span className="pi-username-handle">@{user?.username || 'Guest'}</span>
           </div>
           <div className="main-content">
             <Board
